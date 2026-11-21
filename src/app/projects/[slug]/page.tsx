@@ -13,6 +13,8 @@ import { ProjectArt } from "@/components/projects/ProjectArt";
 import { BrandIcon } from "@/components/diary/Polaroid";
 import { tilt } from "@/lib/utils";
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
 }

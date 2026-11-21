@@ -277,3 +277,47 @@ export function Laptop({ screen, open = 1.9 }: { screen?: THREE.Texture; open?: 
     </group>
   );
 }
+
+/** Roll of washi tape lying flat, with a short strip pulled out across the desk. */
+export function WashiRoll({ color, strip = 0, stripMap }: { color: string; strip?: number; stripMap?: THREE.Texture }) {
+  const rO = 0.2;
+  const rI = 0.135;
+  const h = 0.11;
+  return (
+    <group>
+      <mesh position={[0, h / 2, 0]} castShadow>
+        <cylinderGeometry args={[rO, rO, h, 40, 1, true]} />
+        <meshStandardMaterial color={color} roughness={0.55} />
+      </mesh>
+      <mesh position={[0, h + 0.0005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[rI, rO, 40]} />
+        <meshStandardMaterial color={stripMap ? "#ffffff" : color} roughness={0.7} map={stripMap ?? null} />
+      </mesh>
+      {/* cardboard core */}
+      <mesh position={[0, h / 2, 0]}>
+        <cylinderGeometry args={[rI, rI, h + 0.004, 40, 1, true]} />
+        <meshStandardMaterial color="#C8A374" roughness={0.9} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, h + 0.0025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[rI - 0.012, rI, 40]} />
+        <meshStandardMaterial color="#a9875d" roughness={0.9} />
+      </mesh>
+      {strip > 0 && (
+        <mesh position={[strip / 2, 0.002, rO - 0.004]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[strip, h * 0.95]} />
+          <meshStandardMaterial color={stripMap ? "#ffffff" : color} roughness={0.6} transparent opacity={0.92} map={stripMap ?? null} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+/** Flat vinyl sticker stuck to the desk. */
+export function Decal({ map, size = 0.3 }: { map: THREE.Texture; size?: number }) {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.003, 0]} receiveShadow>
+      <planeGeometry args={[size, size]} />
+      <meshStandardMaterial map={map} transparent alphaTest={0.3} roughness={0.35} />
+    </mesh>
+  );
+}

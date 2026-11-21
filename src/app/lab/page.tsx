@@ -11,6 +11,7 @@ import { Terminal } from "@/components/lab/Terminal";
 import { LatencyScale, MorseEncoder, SortingVisualiser } from "@/components/lab/Experiments";
 import { Classified } from "@/components/lab/Classified";
 import { tilt } from "@/lib/utils";
+import { HazardLabel } from "@/components/ui/Scrapbook";
 
 export const metadata: Metadata = {
   title: "Lab",
@@ -39,8 +40,11 @@ export default function LabPage() {
     <PageShell>
       <PageHeader page="06" kicker="experiments · prototypes · weird stuff" color="bg-electric text-paper" title={<>The<br />lab.</>} note="safety goggles recommended" />
 
-      <section aria-labelledby="terminal">
+      <section aria-labelledby="terminal" className="relative">
         <SectionHeading id="terminal" note="it actually works. type 'help'.">Terminal</SectionHeading>
+        <HazardLabel title="Experimental area" className="mb-6 rotate-1 lg:absolute lg:-top-6 lg:right-2 lg:mb-0 lg:rotate-3">
+          contents may be unfinished, buggy or delightful. handle with curiosity.
+        </HazardLabel>
         <Terminal />
       </section>
 

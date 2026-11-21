@@ -1,6 +1,14 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Hand, ScribbleArrow } from "./Typography";
+import { PostageStamp, StarSticker, Washi, type WashiPattern } from "./Scrapbook";
+
+const WASHI: { color: string; pattern: WashiPattern }[] = [
+  { color: "#FF755E", pattern: "stripe" },
+  { color: "#477BFF", pattern: "dots" },
+  { color: "#9DDC8B", pattern: "grid" },
+  { color: "#FFD84D", pattern: "check" },
+];
 
 /**
  * The big title block every diary page opens with:
@@ -23,15 +31,24 @@ export function PageHeader({
   children?: ReactNode;
   className?: string;
 }) {
+  const n = Number.parseInt(page, 10) || 0;
+  const tape = WASHI[n % WASHI.length];
+  const bg = color.split(" ").find((c) => c.startsWith("bg-")) ?? "bg-sun";
   return (
-    <header className={cn("relative mb-10 pt-6 sm:mb-14 sm:pt-10", className)}>
+    <header className={cn("relative mb-10 pt-6 sm:mb-14 sm:pt-10 xl:min-h-[21rem]", className)}>
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <span className={cn("brutal-sm px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-[0.2em]", color)}>
+        <span className={cn("brutal-sm relative px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-[0.2em]", color)}>
           p.{page}
+          <Washi pattern={tape.pattern} color={tape.color} className="-left-4 -top-3 !h-5 !w-12 -rotate-[24deg]" />
         </span>
         <span className="font-mono text-xs uppercase tracking-[0.25em] text-ink-soft">{kicker}</span>
       </div>
-      <h1 className="max-w-[14ch] text-[clamp(3.2rem,11vw,9rem)] font-extrabold uppercase leading-[0.85] tracking-[-0.04em]">
+      {/* torn scrap of coloured paper glued behind the title */}
+      <span
+        aria-hidden
+        className={cn("torn-bottom torn-top absolute -left-3 top-[4.6rem] -z-0 h-[clamp(3rem,9vw,7.2rem)] w-[min(78%,34rem)] -rotate-[1.5deg] opacity-45 sm:top-[5.6rem]", bg)}
+      />
+      <h1 className="relative max-w-[14ch] text-[clamp(3.2rem,11vw,9rem)] font-extrabold uppercase leading-[0.85] tracking-[-0.04em]">
         {title}
       </h1>
       {note && (
@@ -40,6 +57,11 @@ export function PageHeader({
           <Hand className="text-2xl text-ink">{note}</Hand>
         </div>
       )}
+      {/* desk clutter on wide screens */}
+      <div aria-hidden className="pointer-events-none absolute right-16 top-44 hidden xl:block">
+        <PostageStamp value={`${n * 5 || 1}¢`} label={kicker.split("·")[0].trim()} color={bg === "bg-paper" ? "bg-sun" : bg} rotate={n % 2 ? 7 : -6} />
+        <StarSticker color={WASHI[(n + 2) % WASHI.length].color} className="absolute -bottom-6 -left-8 h-12 w-12 rotate-12" />
+      </div>
       {children}
     </header>
   );

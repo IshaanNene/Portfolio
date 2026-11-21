@@ -25,14 +25,14 @@ export const site = {
     "[PLACEHOLDER] Write two or three sentences about who you are, where you're based and what kind of engineering you enjoy most.",
     "[PLACEHOLDER] Add a second paragraph about how you got into building software and what keeps you curious.",
   ],
-  /** Replace with /images/your-photo.jpg (portrait, ~800×1000). */
-  photo: "/images/photo-placeholder.svg",
+  /** Replace with /images/your-photo.jpg (portrait, ~800×1000). Keep the basePath prefix. */
+  photo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/photo-placeholder.svg`,
   photoAlt: "[PLACEHOLDER] Portrait photo",
   location: "[City, Country]",
   /** IANA timezone used by the flip clock on /now. */
   timezone: "Asia/Kolkata",
   /** Public URL of the deployed site (used for SEO + sitemap). */
-  url: "https://example.com",
+  url: "https://ishaannene.github.io/Portfolio",
 
   status: {
     available: true,

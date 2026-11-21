@@ -197,6 +197,341 @@ function tape(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, ro
   ctx.restore();
 }
 
+/* ───────────── scrapbook bits ───────────── */
+
+type Pattern = "stripe" | "dots" | "grid" | "check";
+
+/** Patterned washi tape with zig-zag torn ends. (x, y) is the strip's centre. */
+function washi(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, rot: number, color: string, pattern: Pattern, h = 58) {
+  ctx.save();
+  ctx.translate(x - 0, y);
+  ctx.rotate(rot);
+  ctx.translate(-w / 2, -h / 2);
+  const steps = 8;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(w, 0);
+  for (let k = 0; k <= steps; k++) ctx.lineTo(w - (k % 2 ? 7 : 0), (k * h) / steps);
+  ctx.lineTo(0, h);
+  for (let k = steps; k >= 0; k--) ctx.lineTo(k % 2 ? 7 : 0, (k * h) / steps);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  ctx.save();
+  ctx.translate(3, 4);
+  ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.clip();
+  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = "#FFFFFF";
+  ctx.strokeStyle = "#FFFFFF";
+  if (pattern === "stripe") {
+    for (let i = -h; i < w + h; i += 26) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + 11, 0);
+      ctx.lineTo(i + 11 + h, h);
+      ctx.lineTo(i + h, h);
+      ctx.fill();
+    }
+  } else if (pattern === "dots") {
+    for (let yy = 10; yy < h; yy += 20)
+      for (let xx = (yy / 20) % 2 ? 10 : 20; xx < w; xx += 22) {
+        ctx.beginPath();
+        ctx.arc(xx, yy, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+  } else if (pattern === "grid") {
+    ctx.lineWidth = 2;
+    for (let i = 8; i < w; i += 16) ctx.fillRect(i, 0, 2, h);
+    for (let i = 8; i < h; i += 16) ctx.fillRect(0, i, w, 2);
+  } else {
+    for (let yy = 0; yy < h; yy += 14) for (let xx = (yy / 14) % 2 ? 0 : 14; xx < w; xx += 28) ctx.fillRect(xx, yy, 14, 14);
+  }
+  ctx.restore();
+}
+
+/** A scrap of coloured paper with ragged, hand-torn edges. */
+function tornPaper(ctx: CanvasRenderingContext2D, r: () => number, x: number, y: number, w: number, h: number, color: string, alpha = 1) {
+  const pts: [number, number][] = [];
+  const step = 16;
+  for (let i = 0; i <= w; i += step) pts.push([x + i, y + jitter(r, 5)]);
+  for (let i = 0; i <= h; i += step) pts.push([x + w + jitter(r, 5), y + i]);
+  for (let i = w; i >= 0; i -= step) pts.push([x + i, y + h + jitter(r, 5)]);
+  for (let i = h; i >= 0; i -= step) pts.push([x + jitter(r, 5), y + i]);
+  ctx.save();
+  ctx.beginPath();
+  pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+  ctx.closePath();
+  ctx.fillStyle = "rgba(60,40,10,0.14)";
+  ctx.translate(4, 6);
+  ctx.fill();
+  ctx.translate(-4, -6);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.fill();
+  // white fibrous rim where the paper tore
+  ctx.globalAlpha = 0.5 * alpha;
+  ctx.strokeStyle = "#FFFFFF";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** Postage stamp with perforated edge and an optional ink postmark. */
+function postageStamp(
+  ctx: CanvasRenderingContext2D,
+  f: Fonts,
+  x: number,
+  y: number,
+  rot: number,
+  color: string,
+  value: string,
+  label: string,
+  bg = "#FBF5E8",
+  postmark = true,
+) {
+  const w = 150;
+  const h = 180;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.fillRect(5, 7, w, h);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = bg;
+  for (let i = 0; i <= w; i += 15) {
+    ctx.beginPath();
+    ctx.arc(i, 0, 5, 0, Math.PI * 2);
+    ctx.arc(i, h, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  for (let i = 0; i <= h; i += 15) {
+    ctx.beginPath();
+    ctx.arc(0, i, 5, 0, Math.PI * 2);
+    ctx.arc(w, i, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = color;
+  ctx.fillRect(14, 14, w - 28, h - 28);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(14, 14, w - 28, h - 28);
+  // tiny sun-over-hills illustration
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.beginPath();
+  ctx.arc(w * 0.62, 70, 22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(23,23,23,0.8)";
+  ctx.beginPath();
+  ctx.moveTo(14, 130);
+  ctx.quadraticCurveTo(50, 92, 80, 118);
+  ctx.quadraticCurveTo(110, 96, w - 14, 112);
+  ctx.lineTo(w - 14, 140);
+  ctx.lineTo(14, 140);
+  ctx.fill();
+  ctx.fillStyle = color === "#477BFF" ? "#FFFFFF" : INK;
+  ctx.font = `800 34px ${f.display}`;
+  ctx.fillText(value, 22, 50);
+  ctx.font = `500 13px ${f.mono}`;
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText(label.toUpperCase().slice(0, 14), 22, h - 22);
+  ctx.restore();
+  if (!postmark) return;
+  // postmark (drawn un-rotated so it overlaps the stamp edge)
+  ctx.save();
+  ctx.translate(x + w * 0.95, y + h * 0.3);
+  ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = "#2a3d8f";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(0, 0, 58, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, 0, 44, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = "#2a3d8f";
+  ctx.font = `700 15px ${f.mono}`;
+  ctx.textAlign = "center";
+  ctx.fillText("DEV DIARY", 0, -12);
+  ctx.fillText("★ 2026 ★", 0, 10);
+  ctx.textAlign = "left";
+  for (let k = 0; k < 4; k++) {
+    ctx.beginPath();
+    for (let i = 0; i <= 20; i++) ctx.lineTo(66 + i * 8, -24 + k * 16 + Math.sin(i * 1.1) * 5);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/** Ticket stub with notched perforation. */
+function ticketStub(ctx: CanvasRenderingContext2D, f: Fonts, x: number, y: number, rot: number, color: string, title: string, no: number, bg = "#FBF5E8") {
+  const w = 340;
+  const h = 150;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = "rgba(0,0,0,0.16)";
+  ctx.fillRect(5, 7, w, h);
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  ctx.arc(250, 0, 14, 0, Math.PI * 2);
+  ctx.arc(250, h, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.setLineDash([8, 8]);
+  ctx.beginPath();
+  ctx.moveTo(250, 18);
+  ctx.lineTo(250, h - 18);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeRect(10, 10, 226, h - 20);
+  const ink = color === "#477BFF" ? "#FFFFFF" : INK;
+  ctx.fillStyle = ink;
+  ctx.font = `500 15px ${f.mono}`;
+  ctx.fillText("ADMIT ONE · VISITOR", 24, 38);
+  const t = title.toUpperCase();
+  let fs = 40;
+  ctx.font = `800 ${fs}px ${f.display}`;
+  while (ctx.measureText(t).width > 205 && fs > 20) {
+    fs -= 2;
+    ctx.font = `800 ${fs}px ${f.display}`;
+  }
+  ctx.fillText(t, 24, 88);
+  ctx.font = `500 15px ${f.mono}`;
+  ctx.fillText("ROW P · SEAT " + (no + 1), 24, 120);
+  ctx.save();
+  ctx.translate(296, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.font = `700 18px ${f.mono}`;
+  ctx.fillText("No. 00" + (no + 1), 0, 6);
+  ctx.restore();
+  ctx.restore();
+}
+
+/** Small polaroid with a coloured "photo" and handwritten caption. */
+function miniPolaroid(ctx: CanvasRenderingContext2D, f: Fonts, r: () => number, x: number, y: number, rot: number, color: string, caption: string) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.fillRect(6, 8, 230, 270);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, 230, 270);
+  ctx.fillStyle = color;
+  ctx.fillRect(16, 16, 198, 186);
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.beginPath();
+  ctx.arc(60 + r() * 100, 70, 24, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(23,23,23,0.75)";
+  ctx.beginPath();
+  ctx.moveTo(16, 202);
+  ctx.lineTo(90, 120 + r() * 30);
+  ctx.lineTo(140, 170);
+  ctx.lineTo(180, 140);
+  ctx.lineTo(214, 190);
+  ctx.lineTo(214, 202);
+  ctx.fill();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(16, 16, 198, 186);
+  ctx.fillStyle = INK;
+  ctx.font = `700 36px ${f.hand}`;
+  ctx.fillText(caption, 22, 250);
+  ctx.restore();
+}
+
+function coffeeRing(ctx: CanvasRenderingContext2D, r: () => number, x: number, y: number, rad: number) {
+  ctx.save();
+  for (let i = 0; i < 3; i++) {
+    ctx.strokeStyle = `rgba(120,70,25,${0.1 + r() * 0.08})`;
+    ctx.lineWidth = 4 + r() * 8;
+    ctx.beginPath();
+    ctx.arc(x + jitter(r, 3), y + jitter(r, 3), rad - i * 5, r() * 0.6, Math.PI * 2 - r() * 0.8);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function starSticker(ctx: CanvasRenderingContext2D, x: number, y: number, rad: number, color: string) {
+  ctx.save();
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#FFFFFF";
+  ctx.lineWidth = 14;
+  star(ctx, x, y, rad);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  star(ctx, x, y, rad, color);
+  ctx.restore();
+}
+
+/** Paper clip drawn as a rounded wire loop. */
+function paperClip(ctx: CanvasRenderingContext2D, x: number, y: number, rot: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.strokeStyle = "#8a8f98";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(14, 40);
+  ctx.lineTo(14, 120);
+  ctx.arc(28, 120, 14, Math.PI, 0, true);
+  ctx.lineTo(42, 20);
+  ctx.arc(22, 20, 20, 0, Math.PI, true);
+  ctx.lineTo(2, 130);
+  ctx.arc(28, 130, 26, Math.PI, 0, true);
+  ctx.lineTo(54, 50);
+  ctx.stroke();
+  ctx.restore();
+}
+
+const WASHI: { color: string; pattern: Pattern }[] = [
+  { color: "#FF755E", pattern: "stripe" },
+  { color: "#477BFF", pattern: "dots" },
+  { color: "#9DDC8B", pattern: "grid" },
+  { color: "#FFD84D", pattern: "check" },
+];
+
+/** Tape the outer top corner of a page with washi. */
+function cornerWashi(ctx: CanvasRenderingContext2D, side: "left" | "right", n: number, y = 52) {
+  const t = WASHI[n % WASHI.length];
+  const outerX = side === "right" ? PAGE_W - 90 : 90;
+  washi(ctx, outerX, y, 230, side === "right" ? 0.62 : -0.62, t.color, t.pattern);
+}
+
+/** The scrapbook extras on a chapter page, placed in the free lower-left area. */
+function chapterScraps(ctx: CanvasRenderingContext2D, f: Fonts, r: () => number, side: "left" | "right", pageNo: number, color: string, title: string) {
+  const accent = color === "#FFFFFF" ? "#FFD84D" : color;
+  const v = pageNo % 4;
+  if (v === 0) {
+    ticketStub(ctx, f, 140, 900, -0.08, accent, title, pageNo);
+    washi(ctx, 190, 905, 120, 0.5, WASHI[(pageNo + 1) % 4].color, WASHI[(pageNo + 1) % 4].pattern, 44);
+  } else if (v === 1) {
+    postageStamp(ctx, f, 170, 860, -0.1, accent, String(10 + pageNo * 5) + "¢", title);
+  } else if (v === 2) {
+    miniPolaroid(ctx, f, r, 160, 840, 0.07, accent, title.toLowerCase() + " ♥");
+    washi(ctx, 275, 840, 140, -0.12, WASHI[pageNo % 4].color, WASHI[pageNo % 4].pattern, 44);
+  } else {
+    tornPaper(ctx, r, 140, 860, 330, 220, accent, 0.95);
+    paperClip(ctx, 400, 820, 0.25);
+    ctx.fillStyle = accent === "#477BFF" ? "#FFFFFF" : INK;
+    ctx.font = `700 44px ${f.hand}`;
+    ["note to self:", "keep it weird,", "keep shipping."].forEach((l, i) => ctx.fillText(l, 170, 930 + i * 52));
+  }
+  cornerWashi(ctx, side, pageNo);
+  starSticker(ctx, side === "right" ? 860 : 880, 610, 30, WASHI[(pageNo + 2) % 4].color);
+  if (pageNo % 3 === 1) coffeeRing(ctx, r, side === "right" ? 780 : 820, 1320, 90);
+}
+
 function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((res) => {
     const img = new Image();
@@ -347,10 +682,10 @@ export async function paintCover(f: Fonts, scale: number): Promise<Painted> {
   sketchLine(ctx, r, 470, 600, 540, 660, 4);
   sketchLine(ctx, r, 520, 640, 545, 665, 2);
   sketchLine(ctx, r, 548, 662, 520, 668, 2);
-  // squiggle
-  ctx.beginPath();
-  for (let i = 0; i <= 40; i++) ctx.lineTo(560 + i * 9, 1110 + Math.sin(i * 0.9) * 14);
-  ctx.stroke();
+  // scrapbook extras: washi tape on the corners
+  washi(ctx, 940, 40, 240, 0.7, "#FFD84D", "check");
+  washi(ctx, 160, 1350, 220, -0.35, "#9DDC8B", "grid", 50);
+  washi(ctx, 520, 1060, 150, 0.25, "#477BFF", "stripe", 44);
 
   // printed stickers
   ctx.save();
@@ -608,6 +943,8 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.strokeStyle = INK;
     ctx.lineWidth = 5;
     star(ctx, 830, 1220, 40, "#FF755E");
+    washi(ctx, 170, 60, 260, -0.5, "#477BFF", "dots");
+    washi(ctx, 860, 1340, 260, -0.4, "#FFD84D", "check");
     links.push({ x: 120, y: 520, w: 760, h: 120, href: "/contact" });
     return { texture: toTexture(c), links };
   }
@@ -644,6 +981,9 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.rotate(-0.04);
     ctx.fillText("↖ tap a line to jump there", 0, 0);
     ctx.restore();
+    cornerWashi(ctx, side, 1);
+    starSticker(ctx, 880, 1170, 34, "#FF755E");
+    starSticker(ctx, 930, 1090, 20, "#9DDC8B");
     pageNumber(ctx, f, "i", side);
     return { texture: toTexture(c), links };
   }
@@ -675,6 +1015,8 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     sketchLine(ctx, r, 340, 1220, 560, 1220, 2);
     sketchLine(ctx, r, 520, 1220, 520, 1260, 2);
     sketchLine(ctx, r, 480, 1220, 480, 1250, 2);
+    cornerWashi(ctx, side, 2);
+    postageStamp(ctx, f, 760, 1140, 0.12, "#FF755E", "?¢", "secret post");
     pageNumber(ctx, f, "xi", side);
     return { texture: toTexture(c), links };
   }
@@ -693,12 +1035,18 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     const b = readButton(ctx, f, "SAY HI →", 0, 0, "#9DDC8B");
     ctx.restore();
     links.push({ x: 510, y: 1030, w: b.w + 20, h: b.h + 30, href: "/contact" });
+    cornerWashi(ctx, side, 3);
+    miniPolaroid(ctx, f, r, 150, 740, -0.08, "#477BFF", "to be continued");
     pageNumber(ctx, f, "xii", side);
     return { texture: toTexture(c), links };
   }
 
   // chapter
-  ruled(ctx, 520, 62, side === "left" ? 120 : 120);
+  ruled(ctx, 520, 62, 120);
+  {
+    const accent = face.color === "#FFFFFF" ? "#FFD84D" : face.color;
+    tornPaper(ctx, r, 118, 214, 760, 180, accent, 0.32);
+  }
   // colour tab
   ctx.fillStyle = face.color;
   ctx.fillRect(side === "right" ? PAGE_W - 150 : 0, 120, 150, 120);
@@ -736,6 +1084,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
   });
 
   drawDoodle(ctx, f, face.doodle, r, face.color);
+  chapterScraps(ctx, f, r, side, pageNo, face.color, face.title);
 
   ctx.save();
   ctx.translate(150, 1180);
@@ -918,4 +1267,147 @@ export function paintBlobShadow() {
   ctx.fillRect(0, 0, 256, 256);
   const t = new THREE.CanvasTexture(c);
   return t;
+}
+
+/* ───────────── scrapbook 3D bits ───────────── */
+
+/** Index flag that sticks out of the diary's fore-edge. Left half hides between pages. */
+export function paintFlag(f: Fonts, page: string, title: string, color: string) {
+  const W = 512;
+  const H = 200;
+  const { c, ctx } = canvas(1, W, H);
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  ctx.fillRect(0, 0, W / 2, H);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 10;
+  ctx.strokeRect(W / 2 - 6, 5, W / 2, H - 10);
+  const ink = color === "#477BFF" ? "#FFFFFF" : INK;
+  ctx.fillStyle = ink;
+  ctx.font = `800 72px ${f.display}`;
+  ctx.fillText(page, W / 2 + 22, 86);
+  let size = 46;
+  const label = title.toUpperCase();
+  ctx.font = `700 ${size}px ${f.mono}`;
+  while (ctx.measureText(label).width > W / 2 - 44 && size > 20) {
+    size -= 2;
+    ctx.font = `700 ${size}px ${f.mono}`;
+  }
+  ctx.fillText(label, W / 2 + 22, 160);
+  return toTexture(c, 8);
+}
+
+/** A ticket stub texture (transparent around the notches). */
+export function paintTicket(f: Fonts, color: string, title: string, no: number) {
+  const { c, ctx } = canvas(1, 350, 160);
+  ticketStub(ctx, f, 0, 0, 0, color, title, no, "rgba(0,0,0,0)");
+  // punch the notches out properly
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(250, 0, 14, 0, Math.PI * 2);
+  ctx.arc(250, 150, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.clearRect(340, 0, 10, 160);
+  ctx.clearRect(0, 150, 350, 10);
+  return toTexture(c, 4);
+}
+
+/** Vinyl sticker decal (transparent background). */
+export function paintDecal(f: Fonts, kind: "star" | "heart" | "smile" | "bolt" | "text", color: string, text = "") {
+  const { c, ctx } = canvas(1, 256, 256);
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  const outline = (draw: () => void) => {
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = 26;
+    draw();
+    ctx.stroke();
+    ctx.fillStyle = color;
+    draw();
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 7;
+    ctx.stroke();
+  };
+  if (kind === "star") {
+    outline(() => {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const a = (i * Math.PI) / 5 - Math.PI / 2;
+        const rr = i % 2 ? 44 : 100;
+        ctx.lineTo(128 + Math.cos(a) * rr, 134 + Math.sin(a) * rr);
+      }
+      ctx.closePath();
+    });
+  } else if (kind === "heart") {
+    outline(() => {
+      ctx.beginPath();
+      ctx.moveTo(128, 216);
+      ctx.bezierCurveTo(20, 140, 30, 50, 90, 50);
+      ctx.bezierCurveTo(115, 50, 128, 70, 128, 86);
+      ctx.bezierCurveTo(128, 70, 141, 50, 166, 50);
+      ctx.bezierCurveTo(226, 50, 236, 140, 128, 216);
+      ctx.closePath();
+    });
+  } else if (kind === "bolt") {
+    outline(() => {
+      ctx.beginPath();
+      [[150, 20], [60, 140], [120, 140], [96, 236], [196, 104], [134, 104], [170, 20]].forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.closePath();
+    });
+  } else if (kind === "smile") {
+    outline(() => {
+      ctx.beginPath();
+      ctx.arc(128, 128, 100, 0, Math.PI * 2);
+    });
+    ctx.fillStyle = INK;
+    ctx.beginPath();
+    ctx.arc(95, 105, 13, 0, Math.PI * 2);
+    ctx.arc(161, 105, 13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 9;
+    ctx.beginPath();
+    ctx.arc(128, 130, 55, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+  } else {
+    outline(() => {
+      ctx.beginPath();
+      ctx.roundRect(14, 78, 228, 100, 50);
+    });
+    ctx.fillStyle = color === "#477BFF" ? "#FFFFFF" : INK;
+    ctx.font = `800 44px ${f.display}`;
+    ctx.textAlign = "center";
+    ctx.fillText(text, 128, 144);
+  }
+  return toTexture(c, 4);
+}
+
+/** Folded note poking out of the pages. */
+export function paintNote(f: Fonts, text: string) {
+  const { c, ctx } = canvas(1, 300, 300);
+  paper(ctx, "#FFFFFF", 17, 300, 300);
+  ctx.strokeStyle = "rgba(71,123,255,0.35)";
+  ctx.lineWidth = 2;
+  for (let y = 60; y < 300; y += 34) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(300, y);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(148, 0, 3, 300);
+  ctx.fillStyle = INK;
+  ctx.font = `700 40px ${f.hand}`;
+  wrap(ctx, text, 260).slice(0, 4).forEach((l, i) => ctx.fillText(l, 20, 52 + i * 34 * 1.0 + i * 8));
+  return toTexture(c, 4);
+}
+
+/** Repeating washi-tape pattern (colour baked in). */
+export function paintWashi(color: string, pattern: Pattern) {
+  const { c, ctx } = canvas(1, 256, 128);
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 256, 128);
+  washi(ctx, 128, 64, 300, 0, color, pattern, 128);
+  return toTexture(c, 4);
 }

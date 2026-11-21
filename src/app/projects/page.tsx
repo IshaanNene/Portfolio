@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProjectGallery } from "@/components/projects/ProjectGallery";
 import { Newspaper } from "@/components/projects/Newspaper";
+import { CautionTape } from "@/components/ui/Scrapbook";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -19,7 +20,8 @@ export default function ProjectsPage() {
         <h2 id="gallery" className="sr-only">Project gallery</h2>
         <ProjectGallery />
       </section>
-      <section aria-labelledby="press" className="mt-28">
+      <CautionTape text="work in progress · mind the wet paint" className="mt-24" />
+      <section aria-labelledby="press" className="mt-20">
         <SectionHeading id="press" note="clippings I keep on the fridge">In the press</SectionHeading>
         <Newspaper />
       </section>

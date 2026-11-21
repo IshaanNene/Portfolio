@@ -3,6 +3,7 @@ import { site } from "@/config/site";
 import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Envelope } from "@/components/diary/Envelope";
+import { Postcard } from "@/components/ui/Scrapbook";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -16,6 +17,9 @@ export default function ContactPage() {
       <h2 className="sr-only">Contact details and form</h2>
       <div className="pb-16">
         <Envelope />
+      </div>
+      <div className="mx-auto mb-16 max-w-3xl rotate-[0.8deg]">
+        <Postcard to={site.name} message="hope you're well! pop a letter in the envelope above — I'd love to hear from you." />
       </div>
     </PageShell>
   );

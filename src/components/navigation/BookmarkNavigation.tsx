@@ -63,7 +63,7 @@ export function BookmarkNavigation() {
       </div>
 
       {/* ── Desktop bookmark ribbons ── */}
-      <nav aria-label="Diary chapters" className="fixed right-0 top-1/2 z-40 hidden -translate-y-1/2 md:block">
+      <nav aria-label="Diary chapters" className="pointer-events-none fixed right-0 top-1/2 z-40 hidden -translate-y-1/2 md:block">
         <ul className="flex max-h-[92vh] flex-col items-end gap-1.5 overflow-y-auto overflow-x-visible py-2 pl-10 no-scrollbar">
           {navItems.map((item, i) => {
             const active = isActive(pathname, item.href);
@@ -74,7 +74,7 @@ export function BookmarkNavigation() {
                   aria-current={active ? "page" : undefined}
                   onMouseEnter={() => play("tick")}
                   className={cn(
-                    "group relative flex h-11 w-44 items-center gap-2 border-[3px] border-r-0 border-ink pl-5 pr-3 font-display text-sm font-extrabold uppercase tracking-tight transition-transform duration-300 ease-[var(--ease-paper)]",
+                    "group pointer-events-auto relative flex h-11 w-44 items-center gap-2 border-[3px] border-r-0 border-ink pl-5 pr-3 font-display text-sm font-extrabold uppercase tracking-tight transition-transform duration-300 ease-[var(--ease-paper)]",
                     colorClass[item.color],
                     active
                       ? "translate-x-10 shadow-brutal"

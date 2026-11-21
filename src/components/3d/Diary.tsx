@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { Edges, useCursor } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { diaryBlockTop, diaryInsideCover, diaryPages } from "@/data/diary";
+import { chapterTabs, diaryBlockTop, diaryInsideCover, diaryPages, type ChapterTab } from "@/data/diary";
 import { DiaryCover } from "./DiaryCover";
 import { DiaryPage } from "./DiaryPages";
 import {
@@ -13,7 +13,11 @@ import {
   paintCover,
   paintDoNotPress,
   paintFace,
+  paintFlag,
+  paintNote,
   paintPageEdges,
+  paintPhoto,
+  paintTicket,
   readFonts,
   type LinkRect,
   type Painted,
@@ -47,6 +51,10 @@ type Textures = {
   cloth: THREE.Texture;
   clothDark: THREE.Texture;
   sticker: THREE.Texture;
+  flags: THREE.Texture[];
+  ticket: THREE.Texture;
+  photo: THREE.Texture;
+  note: THREE.Texture;
 };
 
 async function buildTextures(scale: number): Promise<Textures> {
@@ -69,6 +77,10 @@ async function buildTextures(scale: number): Promise<Textures> {
     cloth: paintCloth("#FF755E", 1),
     clothDark: paintCloth("#171717", 1),
     sticker: paintDoNotPress(f),
+    flags: chapterTabs.map((t) => paintFlag(f, t.page, t.title, t.color === "#FFFFFF" ? "#F5EBD8" : t.color)),
+    ticket: paintTicket(f, "#FFD84D", "Hackathon", 6),
+    photo: paintPhoto(f, "#9DDC8B", "summer '2X", 13),
+    note: paintNote(f, "don't forget: drink water, push code"),
   };
 }
 
@@ -87,15 +99,106 @@ export type DiaryProps = {
   onPrev: () => void;
   onLink: (href: string) => void;
   onSticker: () => void;
+  onJump: (spread: number, side: "left" | "right") => void;
   onReady: () => void;
 };
+
+/* ── index flags on the fore-edge ── */
+const FLAG_L = 0.46;
+const FLAG_H = 0.17;
+const FLAG_OUT = 0.27;
+
+function IndexFlag({
+  tab,
+  map,
+  y,
+  z,
+  out,
+  tilt,
+  active,
+  reduced,
+  onJump,
+}: {
+  tab: ChapterTab;
+  map: THREE.Texture;
+  y: number;
+  z: number;
+  out: number;
+  tilt: number;
+  active: boolean;
+  reduced: boolean;
+  onJump: (spread: number, side: "left" | "right") => void;
+}) {
+  const ref = useRef<THREE.Mesh>(null);
+  const [hover, setHover] = useState(false);
+  const color = tab.color === "#FFFFFF" ? "#F5EBD8" : tab.color;
+  useFrame((_, dt) => {
+    if (!ref.current) return;
+    const k = reduced ? 1 : 1 - Math.exp(-12 * Math.min(dt, 0.05));
+    const target = out + (hover ? 0.06 : 0) + (active ? 0.035 : 0) - FLAG_L / 2;
+    ref.current.position.x += (target - ref.current.position.x) * k;
+  });
+  return (
+    <group position={[PAGE_X + PAGE_WIDTH, y, z]} rotation={[0, 0, tilt]}>
+      <mesh
+        ref={ref}
+        position={[out - FLAG_L / 2, 0, 0]}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHover(true);
+        }}
+        onPointerOut={() => setHover(false)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onJump(tab.spread, tab.side);
+        }}
+      >
+        <boxGeometry args={[FLAG_L, FLAG_H, 0.004]} />
+        <meshStandardMaterial attach="material-0" color={color} roughness={0.6} />
+        <meshStandardMaterial attach="material-1" color={color} roughness={0.6} />
+        <meshStandardMaterial attach="material-2" color={color} roughness={0.6} />
+        <meshStandardMaterial attach="material-3" color={color} roughness={0.6} />
+        <meshStandardMaterial attach="material-4" map={map} roughness={0.55} />
+        <meshStandardMaterial attach="material-5" map={map} roughness={0.55} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── satin ribbon bookmarks: slope out of the pages, then lie on the desk ── */
+function Ribbon({ x, len, yaw, color, drop }: { x: number; len: number; yaw: number; color: string; drop: number }) {
+  const W = 0.065;
+  const tail = useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(-W / 2, 0);
+    s.lineTo(W / 2, 0);
+    s.lineTo(W / 2, -len);
+    s.lineTo(0, -len + 0.045);
+    s.lineTo(-W / 2, -len);
+    s.closePath();
+    return new THREE.ShapeGeometry(s);
+  }, [len]);
+  const run = 0.13;
+  const slope = Math.hypot(run, drop);
+  return (
+    <group position={[x, -PAGE_HEIGHT / 2 + 0.02, -0.025]} rotation={[0, 0, yaw]}>
+      <mesh position={[0, -run / 2, -drop / 2]} rotation={[Math.atan2(drop, run), 0, 0]}>
+        <planeGeometry args={[W, slope]} />
+        <meshStandardMaterial color={color} roughness={0.35} metalness={0.05} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh geometry={tail} position={[0, -run, -drop]}>
+        <meshStandardMaterial color={color} roughness={0.35} metalness={0.05} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
 
 /**
  * The procedural hardcover diary: back board, page block with visible
  * page edges, cloth spine, hinged front cover, five individually curling
  * pages, an elastic band and a ribbon bookmark.
  */
-export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onSticker, onReady }: DiaryProps) {
+export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onSticker, onJump, onReady }: DiaryProps) {
   const [tex, setTex] = useState<Textures | null>(null);
   const [hover, setHover] = useState(false);
   useCursor(hover);
@@ -120,7 +223,7 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
     () => () => {
       if (!tex) return;
       [tex.cover, tex.inside, tex.blockTop, ...tex.pages.flatMap((p) => [p.front, p.back])].forEach((p) => p.texture.dispose());
-      [tex.edgesH, tex.edgesV, tex.cloth, tex.clothDark, tex.sticker].forEach((t) => t.dispose());
+      [tex.edgesH, tex.edgesV, tex.cloth, tex.clothDark, tex.sticker, tex.ticket, tex.photo, tex.note, ...tex.flags].forEach((t) => t.dispose());
     },
     [tex],
   );
@@ -255,10 +358,42 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
         ))}
       </group>
 
-      {/* ribbon bookmark peeking out of the bottom */}
-      <mesh position={[PAGE_X + PAGE_WIDTH * 0.64, -PAGE_HEIGHT / 2 - 0.16, -0.02]} rotation={[-0.55, 0, 0.08]} castShadow={shadows}>
-        <boxGeometry args={[0.07, 0.38, 0.004]} />
-        <meshStandardMaterial color="#477BFF" roughness={0.5} />
+      {/* three satin ribbon bookmarks fanning out of the bottom */}
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.42} len={0.34} yaw={-0.32} color="#477BFF" drop={BOOK.T / 2 + BOOK.coverT - 0.03} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.55} len={0.46} yaw={0.04} color="#FF755E" drop={BOOK.T / 2 + BOOK.coverT - 0.028} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.68} len={0.3} yaw={0.36} color="#FFD84D" drop={BOOK.T / 2 + BOOK.coverT - 0.026} />
+
+      {/* chapter index flags stuck along the fore-edge */}
+      {chapterTabs.map((t, i) => {
+        const left = spread >= 1 && spread === t.spread;
+        return (
+          <IndexFlag
+            key={t.href}
+            tab={t}
+            map={tex.flags[i]}
+            y={PAGE_HEIGHT / 2 - 0.2 - i * ((PAGE_HEIGHT - 0.36) / Math.max(1, chapterTabs.length - 1))}
+            z={-BOOK.T / 2 + blockDepth - 0.008 - i * 0.011}
+            out={FLAG_OUT - (i % 2) * 0.03}
+            tilt={(i % 3 === 0 ? 1 : -1) * 0.025}
+            active={left}
+            reduced={reduced}
+            onJump={onJump}
+          />
+        );
+      })}
+
+      {/* scrapbook clutter tucked between the pages, poking out of the top edge */}
+      <mesh position={[PAGE_X + 0.42, PAGE_HEIGHT / 2 + 0.05, -BOOK.T / 2 + blockDepth - 0.02]} rotation={[0, 0, 0.13]}>
+        <planeGeometry args={[0.62, 0.285]} />
+        <meshStandardMaterial map={tex.ticket} transparent alphaTest={0.4} roughness={0.7} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[PAGE_X + 1.08, PAGE_HEIGHT / 2 + 0.02, -BOOK.T / 2 + blockDepth - 0.05]} rotation={[0, 0, -0.2]}>
+        <planeGeometry args={[0.42, 0.5]} />
+        <meshStandardMaterial map={tex.photo} roughness={0.5} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[PAGE_X + 0.82, PAGE_HEIGHT / 2 - 0.02, -BOOK.T / 2 + blockDepth - 0.035]} rotation={[0, 0, 0.32]}>
+        <planeGeometry args={[0.34, 0.34]} />
+        <meshStandardMaterial map={tex.note} roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );

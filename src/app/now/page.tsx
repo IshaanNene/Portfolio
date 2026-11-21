@@ -12,6 +12,8 @@ import { FlipClock } from "@/components/now/FlipClock";
 import { StickyBoard } from "@/components/now/StickyBoard";
 import { ProjectArt } from "@/components/projects/ProjectArt";
 import { tilt } from "@/lib/utils";
+import { TearOffCalendar } from "@/components/now/TearOffCalendar";
+import { CoffeeRing, StarSticker } from "@/components/ui/Scrapbook";
 
 export const metadata: Metadata = {
   title: "Now",
@@ -41,6 +43,16 @@ export default function NowPage() {
               status: {site.status.label.replace("[PLACEHOLDER] ", "")}
             </Hand>
             {site.status.building.includes("[") && <SampleStamp className="absolute right-4 top-4" label="edit in config" />}
+          </div>
+          <div className="relative mt-14 flex flex-wrap items-start gap-10 pl-2">
+            <TearOffCalendar />
+            <div className="relative max-w-[15rem] pt-6">
+              <CoffeeRing className="absolute -left-6 -top-4 h-36 w-36" />
+              <p className="relative font-hand text-2xl font-bold leading-snug">
+                a desk calendar of notes-to-self. tear a page off — there&rsquo;s always another one underneath.
+              </p>
+              <StarSticker className="relative mt-3 h-10 w-10 rotate-12" color="#9DDC8B" />
+            </div>
           </div>
         </section>
 

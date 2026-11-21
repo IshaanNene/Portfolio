@@ -42,6 +42,19 @@ export const diaryPages: { front: PageFace; back: PageFace }[] = [
   { front: chapter("/contact", "envelope", ["sealed with wax.", "break it to say hi."]), back: { kind: "hint" } },
 ];
 
+export type ChapterTab = { href: string; page: string; title: string; color: string; spread: number; side: "left" | "right" };
+
+/** Index flags stuck to the diary's fore-edge — one per chapter, in reading order. */
+export const chapterTabs: ChapterTab[] = diaryPages.flatMap((p, i) => {
+  const out: ChapterTab[] = [];
+  if (p.front.kind === "chapter") out.push({ ...pick(p.front), spread: i + 1, side: "right" });
+  if (p.back.kind === "chapter") out.push({ ...pick(p.back), spread: i + 2, side: "left" });
+  return out;
+});
+function pick(c: Extract<PageFace, { kind: "chapter" }>) {
+  return { href: c.href, page: c.page, title: c.title, color: c.color };
+}
+
 export const diaryBlockTop: PageFace = { kind: "notes" };
 export const diaryInsideCover: PageFace = { kind: "inside-cover" };
 

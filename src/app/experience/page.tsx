@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Hand, SampleStamp } from "@/components/ui/Typography";
 import { Receipt } from "@/components/diary/Receipt";
 import { Passport } from "@/components/experience/Passport";
+import { LuggageTag } from "@/components/ui/Scrapbook";
 
 export const metadata: Metadata = {
   title: "Experience",
@@ -27,7 +28,16 @@ export default function ExperiencePage() {
         <Receipt />
       </section>
 
-      <section aria-labelledby="passport" className="mt-28">
+      <section aria-labelledby="passport" className="relative mt-28">
+        <div className="absolute right-6 top-6 z-10 hidden rotate-6 xl:block">
+          <LuggageTag
+            lines={[
+              ["from", "the receipt above"],
+              ["to", "wherever's next"],
+              ["contents", "fragile ideas"],
+            ]}
+          />
+        </div>
         <SectionHeading id="passport" note="launches · hackathons · certs · milestones">Passport</SectionHeading>
         <Passport />
       </section>

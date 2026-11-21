@@ -9,6 +9,7 @@ import { Tape } from "@/components/ui/Decor";
 import { AboutDesk } from "@/components/about/AboutDesk";
 import { ScribblePage } from "@/components/about/ScribblePage";
 import { tilt } from "@/lib/utils";
+import { NameTag } from "@/components/ui/Scrapbook";
 
 export const metadata: Metadata = {
   title: "About",
@@ -33,6 +34,9 @@ export default function AboutPage() {
           <Tape className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
           <Image src={site.photo} alt={site.photoAlt} width={600} height={750} unoptimized={isSvg} className="aspect-[4/5] w-full border-2 border-ink object-cover" sizes="320px" />
           <Hand className="absolute bottom-3 left-4 text-2xl">{site.firstName}, probably debugging</Hand>
+          <div className="absolute -right-24 top-10 hidden origin-top-left rotate-[10deg] scale-[0.55] md:block">
+            <NameTag name={site.firstName} />
+          </div>
         </div>
         <div>
           <SectionHeading id="intro" note="the short version">Hello there</SectionHeading>

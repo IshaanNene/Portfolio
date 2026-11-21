@@ -15,7 +15,7 @@ export type Focus = "spread" | "left" | "right";
 function BookRig({ spread, focus, reduced, children }: { spread: number; focus: Focus; reduced: boolean; children: React.ReactNode }) {
   const g = useRef<THREE.Group>(null);
   const tilt = useRef<THREE.Group>(null);
-  const targetX = spread === 0 ? -COVER_W / 2 : focus === "left" ? COVER_W / 2 : focus === "right" ? -COVER_W / 2 : 0;
+  const targetX = spread === 0 ? -COVER_W / 2 : focus === "left" ? COVER_W / 2 : focus === "right" ? -COVER_W / 2 - 0.12 : 0;
   useFrame(({ pointer }, dt) => {
     if (!g.current || !tilt.current) return;
     const k = reduced ? 1 : 1 - Math.exp(-3.4 * Math.min(dt, 0.05));
@@ -39,7 +39,7 @@ export default function HomeScene(
   props: Omit<DiaryProps, "quality"> & { quality: "low" | "high"; focus: Focus; wide: boolean },
 ) {
   const { spread, focus, quality, reduced, wide } = props;
-  const frameW = spread === 0 ? COVER_W * 1.35 : focus === "spread" ? COVER_W * 2.2 : COVER_W * 1.14;
+  const frameW = spread === 0 ? COVER_W * 1.35 : focus === "spread" ? COVER_W * 2.2 : focus === "right" ? COVER_W * 1.3 : COVER_W * 1.14;
   return (
     <Scene quality={quality} className="!absolute inset-0 touch-pan-y">
       <CameraRig target={[0, 0.05, 0.08]} width={frameW} depth={COVER_H * 1.12} reduced={reduced} />

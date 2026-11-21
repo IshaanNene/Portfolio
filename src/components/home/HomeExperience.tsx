@@ -122,6 +122,11 @@ export function HomeExperience() {
                 play("thunk");
                 findEgg("donotpress");
               }}
+              onJump={(k, s) => {
+                play("paper");
+                setSpread(k);
+                setSide(s);
+              }}
               onReady={() => setReady(true)}
             />
           </ErrorBoundary>

@@ -2,16 +2,28 @@
 
 A neo-brutalist, scrapbook-style portfolio. The home page is a procedural 3D diary with turnable pages; every other page is a different kind of paper object (receipts, passport stamps, newspaper clippings, a filing cabinet…).
 
-Built with Next.js 16 (App Router, Cache Components), React 19, Tailwind v4, three.js / React Three Fiber / drei, GSAP and Framer Motion.
+Built with Next.js 16 (App Router, static export), React 19, Tailwind v4, three.js / React Three Fiber / drei, GSAP and Framer Motion.
 
 ## Run it
 
 ```bash
 npm install
 npm run dev        # http://localhost:3000  (use -- --port 3417 if 3000 is busy)
-npm run build && npm start
+npm run build      # static export into out/
 npm run lint
 ```
+
+## Deploy (GitHub Pages)
+
+Every push to `main` runs `.github/workflows/pages.yml`. It builds a static export with `PAGES_BASE_PATH=/<repo>` and publishes `out/` to https://ishaannene.github.io/Portfolio/.
+
+To try the Pages build locally:
+
+```bash
+PAGES_BASE_PATH=/Portfolio npx next build
+```
+
+On a host that serves from the domain root (Vercel, Netlify, a custom domain), leave `PAGES_BASE_PATH` unset and update `site.url`.
 
 ## Make it yours — content lives in two places
 
