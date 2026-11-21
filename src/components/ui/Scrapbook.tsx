@@ -28,7 +28,7 @@ export function Washi({
   className?: string;
   style?: CSSProperties;
 }) {
-  return <span aria-hidden className={cn("tape", className)} style={{ background: PATTERNS[pattern](color), opacity: 0.92, ...style }} />;
+  return <span aria-hidden className={cn("tape", className)} style={{ background: PATTERNS[pattern](color), opacity: 0.8, ...style }} />;
 }
 
 const PERFORATION =

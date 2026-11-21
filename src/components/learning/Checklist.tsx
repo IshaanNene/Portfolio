@@ -13,7 +13,11 @@ const tabColor: Record<LearningGroup, string> = { completed: "bg-grass", explori
 
 function Check({ on }: { on: boolean }) {
   return (
-    <span className="relative grid h-8 w-8 shrink-0 place-items-center border-[3px] border-ink bg-paper" aria-hidden>
+    <span className="relative grid h-8 w-8 shrink-0 place-items-center" aria-hidden>
+      {/* a box drawn by hand, corners not quite meeting */}
+      <svg viewBox="0 0 32 32" className="absolute inset-0 h-8 w-8 overflow-visible">
+        <path d="M3 4 Q16 2 29 3.5 Q30.5 16 29 29 Q16 30.5 3.5 28.5 Q2 16 4 2" fill="#fffdf5" stroke="#171717" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
       <svg viewBox="0 0 32 32" className="absolute -left-1 -top-2 h-11 w-11 overflow-visible">
         <motion.path
           d="M5 17 L13 25 L30 2"
@@ -27,6 +31,26 @@ function Check({ on }: { on: boolean }) {
           transition={{ duration: 0.35 }}
         />
       </svg>
+    </span>
+  );
+}
+
+/** Pencil tally marks: four strokes, then a slash through each group of five. */
+function Tally({ n }: { n: number }) {
+  const groups = Math.ceil(n / 5);
+  return (
+    <span className="flex gap-2" aria-hidden>
+      {Array.from({ length: groups }).map((_, g) => {
+        const k = Math.min(5, n - g * 5);
+        return (
+          <svg key={g} viewBox="0 0 30 22" className="h-5 w-7 overflow-visible">
+            {Array.from({ length: Math.min(4, k) }).map((_, i) => (
+              <path key={i} d={`M${4 + i * 6} 2 Q${5 + i * 6} 11 ${3.5 + i * 6} 20`} stroke="#171717" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+            ))}
+            {k === 5 && <path d="M0 16 L28 5" stroke="#FF755E" strokeWidth="2.4" strokeLinecap="round" />}
+          </svg>
+        );
+      })}
     </span>
   );
 }
@@ -79,7 +103,8 @@ export function Checklist() {
         <div className="ruled min-h-[28rem] py-6 pl-16 pr-5 sm:pr-10">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <p className="font-hand text-3xl font-bold">{groupMeta[tab].scrawl}</p>
-            <p className="font-mono text-xs uppercase">
+            <p className="flex items-center gap-2 font-mono text-xs uppercase">
+              <Tally n={finished} />
               {finished}/{total} done
             </p>
           </div>
@@ -119,12 +144,19 @@ export function Checklist() {
                       <span className="min-w-0">
                         <span className={cn("relative font-hand text-[1.7rem] font-semibold leading-tight", on && "text-ink-soft")}>
                           {item.title.replace("[SAMPLE] ", "")}
-                          <motion.span
-                            className="absolute left-0 top-1/2 h-[3px] bg-coral"
-                            initial={false}
-                            animate={{ width: on ? "100%" : "0%" }}
-                            aria-hidden
-                          />
+                          <svg viewBox="0 0 100 12" preserveAspectRatio="none" className="pointer-events-none absolute -left-1 top-1/2 h-3 w-[calc(100%+0.5rem)] -translate-y-1/2 overflow-visible" aria-hidden>
+                            <motion.path
+                              d="M0 7 C 15 2, 30 11, 50 6 S 85 3, 100 8"
+                              fill="none"
+                              stroke="#FF755E"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              vectorEffect="non-scaling-stroke"
+                              initial={false}
+                              animate={{ pathLength: on ? 1 : 0, opacity: on ? 1 : 0 }}
+                              transition={{ duration: 0.35 }}
+                            />
+                          </svg>
                         </span>
                         <span className="block font-mono text-xs text-ink-soft">{item.note}</span>
                         {item.resource && (

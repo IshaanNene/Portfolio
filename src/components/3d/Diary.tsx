@@ -5,12 +5,15 @@ import { Edges, useCursor } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { chapterTabs, diaryBlockTop, diaryInsideCover, diaryPages, type ChapterTab } from "@/data/diary";
-import { DiaryCover } from "./DiaryCover";
+import { DiaryCover, type CoverLayers } from "./DiaryCover";
 import { DiaryPage } from "./DiaryPages";
 import {
   loadFonts,
   paintCloth,
   paintCover,
+  paintCoverNote,
+  paintCoverPhoto,
+  paintNameplate,
   paintDoNotPress,
   paintFace,
   paintFlag,
@@ -30,7 +33,7 @@ export const BOOK = {
   W: 1.5, // page width
   H: 2.1, // page height
   T: 0.16, // page block thickness
-  coverT: 0.045,
+  coverT: 0.055,
   overhang: 0.05,
   gap: 0.0042,
 };
@@ -55,12 +58,14 @@ type Textures = {
   ticket: THREE.Texture;
   photo: THREE.Texture;
   note: THREE.Texture;
+  layers: CoverLayers;
 };
 
 async function buildTextures(scale: number): Promise<Textures> {
   const f = readFonts();
   await loadFonts(f);
-  const cover = await paintCover(f, scale);
+  const cover = await paintCover(f, scale, true);
+  const layers: CoverLayers = { nameplate: paintNameplate(f), photo: await paintCoverPhoto(f), note: paintCoverNote(f) };
   const inside = paintFace(diaryInsideCover, f, scale, "left", 0);
   const pages = diaryPages.map((p, i) => ({
     front: paintFace(p.front, f, scale, "right", i * 2 + 1),
@@ -81,6 +86,7 @@ async function buildTextures(scale: number): Promise<Textures> {
     ticket: paintTicket(f, "#FFD84D", "Hackathon", 6),
     photo: paintPhoto(f, "#9DDC8B", "summer '2X", 13),
     note: paintNote(f, "don't forget: drink water, push code"),
+    layers,
   };
 }
 
@@ -102,6 +108,15 @@ export type DiaryProps = {
   onJump: (spread: number, side: "left" | "right") => void;
   onReady: () => void;
 };
+
+/* loose sheets peeking out of the page block (deterministic) */
+const LOOSE = [
+  { dx: 0.012, dy: -0.006, dw: 0.0, dh: 0.006, rot: 0.006, z: 0.18, color: "#efe4cc" },
+  { dx: -0.004, dy: 0.01, dw: 0.016, dh: -0.01, rot: -0.008, z: 0.34, color: "#f6efdf" },
+  { dx: 0.016, dy: 0.004, dw: -0.006, dh: 0.0, rot: 0.004, z: 0.5, color: "#e8dcc0" },
+  { dx: 0.006, dy: -0.012, dw: 0.01, dh: 0.012, rot: -0.005, z: 0.66, color: "#f2e9d6" },
+  { dx: 0.02, dy: 0.008, dw: -0.012, dh: -0.006, rot: 0.009, z: 0.82, color: "#ebe0c6" },
+];
 
 /* ── index flags on the fore-edge ── */
 const FLAG_L = 0.46;
@@ -223,7 +238,7 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
     () => () => {
       if (!tex) return;
       [tex.cover, tex.inside, tex.blockTop, ...tex.pages.flatMap((p) => [p.front, p.back])].forEach((p) => p.texture.dispose());
-      [tex.edgesH, tex.edgesV, tex.cloth, tex.clothDark, tex.sticker, tex.ticket, tex.photo, tex.note, ...tex.flags].forEach((t) => t.dispose());
+      [tex.edgesH, tex.edgesV, tex.cloth, tex.clothDark, tex.sticker, tex.ticket, tex.photo, tex.note, ...tex.flags, tex.layers.nameplate, tex.layers.photo, tex.layers.note].forEach((t) => t.dispose());
     },
     [tex],
   );
@@ -290,6 +305,28 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
         <boxGeometry args={[PAGE_WIDTH, PAGE_HEIGHT, blockDepth]} />
       </mesh>
 
+      {/* loose, slightly misaligned sheets so the block's edges look hand-stacked */}
+      {LOOSE.map((l, i) => (
+        <mesh key={i} position={[PAGE_X + PAGE_WIDTH / 2 + l.dx, l.dy, -BOOK.T / 2 + blockDepth * l.z]} rotation={[0, 0, l.rot]}>
+          <boxGeometry args={[PAGE_WIDTH + l.dw, PAGE_HEIGHT + l.dh, 0.0025]} />
+          <meshStandardMaterial color={l.color} roughness={1} />
+        </mesh>
+      ))}
+
+      {/* raised bands across the spine + stitched headbands */}
+      {[-0.36, -0.12, 0.12, 0.36].map((f) => (
+        <mesh key={f} position={[-BOOK.coverT / 2 - 0.004, f * COVER_H, 0]} castShadow={shadows}>
+          <boxGeometry args={[BOOK.coverT + 0.012, 0.028, BOOK.T + BOOK.coverT * 2 + 0.006]} />
+          <meshStandardMaterial color="#262321" roughness={0.7} />
+        </mesh>
+      ))}
+      {[1, -1].map((sgn) => (
+        <mesh key={sgn} position={[0.012, sgn * (PAGE_HEIGHT / 2 + 0.004), -BOOK.T / 2 + blockDepth / 2]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.014, 0.014, blockDepth, 10]} />
+          <meshStandardMaterial color={sgn > 0 ? "#FFD84D" : "#477BFF"} roughness={0.6} />
+        </mesh>
+      ))}
+
       {/* individually turning pages */}
       <group position={[PAGE_X, 0, 0]}>
         {tex.pages.map((p, i) => (
@@ -329,6 +366,7 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
         inside={tex.inside.texture}
         cloth={tex.cloth}
         sticker={tex.sticker}
+        layers={tex.layers}
         shadows={shadows}
         reduced={reduced}
         onStickerPress={onSticker}

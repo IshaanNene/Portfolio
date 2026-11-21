@@ -12,6 +12,7 @@ import { LatencyScale, MorseEncoder, SortingVisualiser } from "@/components/lab/
 import { Classified } from "@/components/lab/Classified";
 import { tilt } from "@/lib/utils";
 import { HazardLabel } from "@/components/ui/Scrapbook";
+import { Printout, TerminalSketch } from "@/components/lab/Printout";
 
 export const metadata: Metadata = {
   title: "Lab",
@@ -60,6 +61,14 @@ export default function LabPage() {
           <Specimen no="003" title="Human-scale latency" note="an engineering concept I love" color="#477BFF">
             <LatencyScale />
           </Specimen>
+        </div>
+      </section>
+
+      <section aria-labelledby="notes" className="mt-24">
+        <SectionHeading id="notes" note="printed out and pinned to the wall">Engineering notes</SectionHeading>
+        <div className="grid items-start gap-12 lg:grid-cols-2">
+          <Printout />
+          <TerminalSketch />
         </div>
       </section>
 

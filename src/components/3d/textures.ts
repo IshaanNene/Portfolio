@@ -554,7 +554,7 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: numb
 
 /* ───────────── COVER ───────────── */
 
-export async function paintCover(f: Fonts, scale: number): Promise<Painted> {
+export async function paintCover(f: Fonts, scale: number, layered = false): Promise<Painted> {
   const { c, ctx } = canvas(scale);
   const r = seeded(11);
 
@@ -590,6 +590,7 @@ export async function paintCover(f: Fonts, scale: number): Promise<Painted> {
   ctx.font = `500 30px ${f.mono}`;
   ctx.fillText("VOL. 01  ·  DEV DIARY  ·  2026", 130, 92);
 
+  if (!layered) {
   // name label
   ctx.save();
   ctx.translate(130, 150);
@@ -621,6 +622,8 @@ export async function paintCover(f: Fonts, scale: number): Promise<Painted> {
   }
   ctx.restore();
 
+  }
+
   // role ribbon
   ctx.save();
   ctx.translate(150, 500);
@@ -633,6 +636,7 @@ export async function paintCover(f: Fonts, scale: number): Promise<Painted> {
   ctx.fillText(role.length > 38 ? role.slice(0, 37) + "…" : role, 24, 0);
   ctx.restore();
 
+  if (!layered) {
   // photo polaroid
   const img = await loadImage(site.photo);
   ctx.save();
@@ -671,6 +675,7 @@ export async function paintCover(f: Fonts, scale: number): Promise<Painted> {
     .forEach((l, i) => ctx.fillText(l, 24, 92 + i * 50));
   ctx.restore();
   tape(ctx, 330, 640, 140, 0.18);
+  }
 
   // doodles
   ctx.strokeStyle = INK;
@@ -1409,5 +1414,135 @@ export function paintWashi(color: string, pattern: Pattern) {
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, 256, 128);
   washi(ctx, 128, 64, 300, 0, color, pattern, 128);
+  return toTexture(c, 4);
+}
+
+
+/* ───────── layered cover objects (separate 3D pieces) ───────── */
+
+export function paintNameplate(f: Fonts) {
+  const W = 740;
+  const H = 300;
+  const { c, ctx } = canvas(1, W, H);
+  ctx.fillStyle = "#FFD84D";
+  ctx.fillRect(0, 0, W, H);
+  grain(ctx, W, H, 2500, 31, "90,60,0");
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 14;
+  ctx.strokeRect(7, 7, W - 14, H - 14);
+  ctx.fillStyle = INK;
+  ctx.font = `500 26px ${f.mono}`;
+  ctx.fillText("PROPERTY OF —", 36, 60);
+  const fit = (s: string, max: number, size: number) => {
+    let sz = size;
+    ctx.font = `800 ${sz}px ${f.display}`;
+    while (ctx.measureText(s).width > max && sz > 40) {
+      sz -= 4;
+      ctx.font = `800 ${sz}px ${f.display}`;
+    }
+  };
+  const parts = site.name.toUpperCase().split(" ");
+  if (parts.length > 1) {
+    fit(parts[0], 660, 118);
+    ctx.fillText(parts[0], 34, 160);
+    fit(parts.slice(1).join(" "), 660, 118);
+    ctx.fillText(parts.slice(1).join(" "), 34, 262);
+  } else {
+    fit(parts[0], 660, 140);
+    ctx.fillText(parts[0], 34, 210);
+  }
+  // label-maker number in the corner
+  ctx.fillStyle = INK;
+  ctx.fillRect(W - 150, 30, 110, 36);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = `700 22px ${f.mono}`;
+  ctx.fillText("NO. 001", W - 140, 56);
+  return toTexture(c, 8);
+}
+
+export async function paintCoverPhoto(f: Fonts) {
+  const W = 350;
+  const H = 420;
+  const { c, ctx } = canvas(1.4, W, H);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, W, H);
+  grain(ctx, W, H, 1500, 41, "60,50,30");
+  const img = await loadImage(site.photo);
+  if (img) drawCover(ctx, img, 22, 22, 306, 316);
+  else {
+    ctx.fillStyle = "#9DDC8B";
+    ctx.fillRect(22, 22, 306, 316);
+  }
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(22, 22, 306, 316);
+  ctx.fillStyle = INK;
+  ctx.font = `700 46px ${f.hand}`;
+  ctx.fillText("that's me ↑", 60, 392);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 8;
+  ctx.strokeRect(0, 0, W, H);
+  return toTexture(c, 8);
+}
+
+export function paintCoverNote(f: Fonts) {
+  const W = 380;
+  const H = 360;
+  const { c, ctx } = canvas(1.2, W, H);
+  ctx.fillStyle = "#FFF4B8";
+  ctx.fillRect(0, 0, W, H);
+  grain(ctx, W, H, 1500, 51, "120,90,0");
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0, 0, W, 40);
+  ctx.fillStyle = INK;
+  ctx.font = `700 46px ${f.hand}`;
+  const note = site.coverNote.replace(/\[PLACEHOLDER\]\s*/g, "");
+  wrap(ctx, note, 330)
+    .slice(0, 6)
+    .forEach((l, i) => ctx.fillText(l, 24, 92 + i * 50));
+  // folded-corner shading (the 3D flap sits on top of this)
+  ctx.fillStyle = "rgba(120,90,0,0.18)";
+  ctx.beginPath();
+  ctx.moveTo(W, H - 70);
+  ctx.lineTo(W, H);
+  ctx.lineTo(W - 70, H);
+  ctx.fill();
+  return toTexture(c, 8);
+}
+
+/** Loose sheet with torn edges and transparent surroundings. */
+export function paintTornSheet(color: string, seed: number, lines = false) {
+  const W = 512;
+  const H = 640;
+  const { c, ctx } = canvas(1, W, H);
+  const r = seeded(seed);
+  const pts: [number, number][] = [];
+  const m = 14;
+  for (let x = m; x <= W - m; x += 12) pts.push([x, m + jitter(r, 7)]);
+  for (let y = m; y <= H - m; y += 12) pts.push([W - m + jitter(r, 7), y]);
+  for (let x = W - m; x >= m; x -= 12) pts.push([x, H - m + jitter(r, 7)]);
+  for (let y = H - m; y >= m; y -= 12) pts.push([m + jitter(r, 7), y]);
+  ctx.beginPath();
+  pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.save();
+  ctx.clip();
+  grain(ctx, W, H, 4000, seed, "80,55,20");
+  if (lines) {
+    ctx.strokeStyle = "rgba(71,123,255,0.3)";
+    ctx.lineWidth = 2;
+    for (let y = 70; y < H; y += 34) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+  ctx.strokeStyle = "rgba(255,255,255,0.6)";
+  ctx.lineWidth = 3;
+  ctx.stroke();
   return toTexture(c, 4);
 }

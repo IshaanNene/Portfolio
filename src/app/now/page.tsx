@@ -14,6 +14,8 @@ import { ProjectArt } from "@/components/projects/ProjectArt";
 import { tilt } from "@/lib/utils";
 import { TearOffCalendar } from "@/components/now/TearOffCalendar";
 import { CoffeeRing, StarSticker } from "@/components/ui/Scrapbook";
+import { ScrapbookLabel, Staple } from "@/components/scrapbook/pieces";
+import { HoverNote } from "@/components/scrapbook/interactive";
 
 export const metadata: Metadata = {
   title: "Now",
@@ -32,6 +34,12 @@ export default function NowPage() {
           <FlipClock />
           <div className="relative mt-10 rotate-[-1deg] border-[3px] border-ink bg-paper p-5 shadow-brutal">
             <Tape className="-top-3 left-8 rotate-[-8deg]" />
+            <Staple className="absolute -top-1 right-10" rotate={4} />
+            <div className="absolute -bottom-5 -right-4 hidden sm:block">
+              <ScrapbookLabel kind="tag" n={1} color="bg-grass" rotate={5}>
+                status
+              </ScrapbookLabel>
+            </div>
             <p className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em]">
               <span className={`h-3 w-3 rounded-full border-2 border-ink ${site.status.available ? "bg-[#2fa046] animate-pulse-dot" : "bg-coral"}`} />
               currently working on
@@ -90,7 +98,9 @@ export default function NowPage() {
 
       <section aria-labelledby="log" className="mt-20 grid gap-8 md:grid-cols-[0.8fr_1.2fr]">
         <div>
-          <SectionHeading id="log">Recent updates</SectionHeading>
+          <SectionHeading id="log">
+            Recent <HoverNote note="newest on top, oldest at the bottom.">updates</HoverNote>
+          </SectionHeading>
           <Hand as="p" className="max-w-xs text-ink-soft">
             the weekly log. newest on top. edit in <code className="font-mono text-sm">src/data/updates.ts</code>
           </Hand>
@@ -99,8 +109,11 @@ export default function NowPage() {
           {weeklyUpdates.map((u, i) => (
             <li key={i} className="relative mb-6 last:mb-0">
               <span className="absolute -left-[2.15rem] top-1 h-5 w-5 rotate-45 border-[3px] border-ink" style={{ background: noteColor[u.tag] }} />
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-                {u.date} · {u.tag}
+              <p className="mb-1 flex flex-wrap items-center gap-2">
+                <ScrapbookLabel kind="date" rotate={i % 2 ? 1.5 : -1.5}>
+                  {u.date.replace(/^\[|\]$/g, "")}
+                </ScrapbookLabel>
+                <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">{u.tag}</span>
               </p>
               <p className="font-hand text-2xl font-semibold leading-tight">{u.text.replace("[PLACEHOLDER] ", "")}</p>
             </li>

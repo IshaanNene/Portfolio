@@ -10,7 +10,15 @@ import { play } from "@/lib/sound";
 import { tilt } from "@/lib/utils";
 import { ProjectArt } from "@/components/projects/ProjectArt";
 import { SampleStamp } from "@/components/ui/Typography";
-import { Tape } from "@/components/ui/Decor";
+import { Washi, type WashiPattern } from "@/components/ui/Scrapbook";
+import { Staple } from "@/components/scrapbook/pieces";
+
+const WASHI: [WashiPattern, string][] = [
+  ["stripe", "#FF755E"],
+  ["dots", "#477BFF"],
+  ["grid", "#9DDC8B"],
+  ["check", "#FFD84D"],
+];
 
 const statusColor: Record<Project["status"], string> = {
   shipped: "#9DDC8B",
@@ -30,6 +38,7 @@ export function BrandIcon({ path, className }: { path: string; className?: strin
 /** A project as a Polaroid: photo "develops" on hover and the card straightens. */
 export function Polaroid({ project, index }: { project: Project; index: number }) {
   const rot = tilt(project.slug, 4);
+  const [pattern, tapeColor] = WASHI[index % WASHI.length];
   return (
     <motion.article
       layout
@@ -39,9 +48,11 @@ export function Polaroid({ project, index }: { project: Project; index: number }
       whileHover={{ rotate: 0, y: -8, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 220, damping: 18, delay: index * 0.05 }}
       onHoverStart={() => play("tick")}
-      className="group relative border-[3px] border-ink bg-paper p-3 pb-4 shadow-brutal-lg"
+      className="group relative border-[3px] border-ink bg-paper p-3 pb-4 shadow-brutal-lg sm:[margin-top:var(--drop)] xl:-mx-3 hover:z-20"
+      style={{ ["--drop" as string]: `${[0, 34, 12][index % 3]}px` }}
     >
-      <Tape className="-top-3 left-1/2 -translate-x-1/2 rotate-[-4deg]" />
+      <Washi pattern={pattern} color={tapeColor} className={index % 2 ? "-top-3 -left-4 -rotate-[30deg]" : "-top-3 left-1/2 -translate-x-1/2 rotate-[-4deg]"} />
+      {index % 2 === 1 && <Washi pattern={pattern} color={tapeColor} className="-right-4 -top-3 rotate-[28deg]" />}
       <Link href={`/projects/${project.slug}`} className="block" aria-label={`Open case file: ${project.name}`}>
         <div className="relative overflow-hidden border-[3px] border-ink">
           <ProjectArt
@@ -59,13 +70,18 @@ export function Polaroid({ project, index }: { project: Project; index: number }
         <h3 className="mt-3 font-hand text-3xl font-bold leading-none">{project.name}</h3>
         <p className="mt-1.5 text-sm leading-snug">{project.summary}</p>
       </Link>
-      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Technology stack">
-        {project.stack.map((t) => (
-          <li key={t} className="border-2 border-ink bg-cream px-1.5 py-0.5 font-mono text-[10px] uppercase">
-            {t}
-          </li>
-        ))}
-      </ul>
+      {/* the stack, scribbled on a sticky stapled to the photo */}
+      <div className="relative -mx-1 mt-3 bg-[#FFE873] p-2 pt-3 shadow-[2px_3px_0_rgba(0,0,0,.15)]" style={{ transform: `rotate(${-rot * 0.4}deg)` }}>
+        <Staple className="absolute -top-1.5 left-3" rotate={-6} />
+        <p className="font-hand text-base font-bold leading-none text-ink-soft">tech notes:</p>
+        <ul className="mt-1.5 flex flex-wrap gap-1.5" aria-label="Technology stack">
+          {project.stack.map((t) => (
+            <li key={t} className="border-2 border-ink bg-paper px-1.5 py-0.5 font-mono text-[10px] uppercase">
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
       <div className="mt-4 flex items-center gap-2">
         <Link
           href={`/projects/${project.slug}`}

@@ -19,6 +19,10 @@ export const EGGS = {
   classified: { name: "Clearance Granted", hint: "Some folders in the Lab are classified." },
   secretnote: { name: "Note Flipper", hint: "Sticky notes have two sides." },
   paperclip: { name: "Clip Collector", hint: "The paperclip at the bottom of every page is loose." },
+  stamp: { name: "Rubber Stamper", hint: "Some stamps hide notes underneath. Press one." },
+  photo: { name: "Back of the Photo", hint: "People write on the backs of photographs." },
+  corner: { name: "Dog-Ear", hint: "Fold a page corner down." },
+  sticker2: { name: "Sticker Pester", hint: "Keep poking a sticker. It'll talk." },
   backpage: { name: "Back Page", hint: "You're reading it." },
 } as const;
 

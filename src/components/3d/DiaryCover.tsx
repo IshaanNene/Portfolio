@@ -5,6 +5,9 @@ import { useCursor } from "@react-three/drei";
 import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { FLIP_EPS } from "./DiaryPages";
+import { PaperClip3D } from "./props";
+
+export type CoverLayers = { nameplate: THREE.Texture; photo: THREE.Texture; note: THREE.Texture };
 
 type Props = {
   width: number;
@@ -16,6 +19,7 @@ type Props = {
   inside: THREE.Texture;
   cloth: THREE.Texture;
   sticker: THREE.Texture;
+  layers: CoverLayers;
   shadows: boolean;
   reduced: boolean;
   onFaceClick: (e: ThreeEvent<MouseEvent>, face: "outside" | "inside") => void;
@@ -26,7 +30,7 @@ type Props = {
  * Hard front cover hinged at the spine. Box faces: +z is the printed cover,
  * -z is the endpaper (reads correctly once the cover swings over).
  */
-export function DiaryCover({ width, height, thickness, hingeZ, open, cover, inside, cloth, sticker, shadows, reduced, onFaceClick, onStickerPress }: Props) {
+export function DiaryCover({ width, height, thickness, hingeZ, open, cover, inside, cloth, sticker, layers, shadows, reduced, onFaceClick, onStickerPress }: Props) {
   const pivot = useRef<THREE.Group>(null);
   const stickerRef = useRef<THREE.Group>(null);
   const progress = useRef(open ? 1 : 0);
@@ -79,6 +83,23 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
       >
         <boxGeometry args={[width, height, thickness]} />
       </mesh>
+      {/* objects glued onto the cover — each a separate physical layer */}
+      <group position={[0, 0, thickness / 2]}>
+        <CoverPiece W={width} H={height} cx={500} cy={300} w={740} h={300} rot={0.025} lift={0.006} map={layers.nameplate} edge="#e8c13a" shadows={shadows} />
+        <CoverPiece W={width} H={height} cx={722} cy={830} w={350} h={420} rot={-0.06} lift={0.01} map={layers.photo} edge="#f4f4f4" shadows={shadows} />
+        <CoverPiece W={width} H={height} cx={339} cy={810} w={380} h={360} rot={0.05} lift={0.005} map={layers.note} edge="#f2e59a" shadows={shadows} fold />
+        {/* tape holding the photo and the note */}
+        <Tape3D W={width} H={height} cx={735} cy={622} w={190} rot={0.12} z={0.017} />
+        <Tape3D W={width} H={height} cx={330} cy={650} w={150} rot={-0.18} z={0.012} />
+        {/* staples through the nameplate */}
+        <Staple3D W={width} H={height} cx={175} cy={180} rot={0.5} z={0.012} />
+        <Staple3D W={width} H={height} cx={835} cy={420} rot={-0.4} z={0.012} />
+        {/* paperclip gripping the sticky note */}
+        <group position={[px(width, 180), py(height, 625), 0.014]} rotation={[Math.PI / 2, 0, 0.12]} scale={0.62}>
+          <PaperClip3D />
+        </group>
+      </group>
+
       {/* "DO NOT PRESS" sticker — a tiny physical decal on the cover */}
       <group ref={stickerRef} position={[width * 0.8, -height * 0.3, thickness / 2 + 0.005]} rotation={[0, 0, 0.2]}>
         <mesh
@@ -101,5 +122,98 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
         </mesh>
       </group>
     </group>
+  );
+}
+
+
+/* ── cover layer helpers: canvas coords (1000×1400 page space) → cover-local units ── */
+const px = (W: number, x: number) => (x / 1000) * W;
+const py = (H: number, y: number) => (0.5 - y / 1400) * H;
+
+function CoverPiece({
+  W,
+  H,
+  cx,
+  cy,
+  w,
+  h,
+  rot,
+  lift,
+  map,
+  edge,
+  shadows,
+  fold = false,
+}: {
+  W: number;
+  H: number;
+  cx: number;
+  cy: number;
+  w: number;
+  h: number;
+  rot: number;
+  lift: number;
+  map: THREE.Texture;
+  edge: string;
+  shadows: boolean;
+  fold?: boolean;
+}) {
+  const sw = (w / 1000) * W;
+  const sh = (h / 1400) * H;
+  const t = 0.004;
+  const flap = Math.min(sw, sh) * 0.2;
+  return (
+    <group position={[px(W, cx), py(H, cy), 0]} rotation={[0, 0, rot]}>
+      {/* hard neo-brutalist offset shadow */}
+      <mesh position={[0.022, -0.026, 0.0015]}>
+        <planeGeometry args={[sw, sh]} />
+        <meshBasicMaterial color="#171717" transparent opacity={0.85} />
+      </mesh>
+      <mesh position={[0, 0, lift]} castShadow={shadows} receiveShadow={shadows}>
+        <boxGeometry args={[sw, sh, t]} />
+        <meshStandardMaterial attach="material-0" color={edge} />
+        <meshStandardMaterial attach="material-1" color={edge} />
+        <meshStandardMaterial attach="material-2" color={edge} />
+        <meshStandardMaterial attach="material-3" color={edge} />
+        <meshStandardMaterial attach="material-4" map={map} roughness={0.75} />
+        <meshStandardMaterial attach="material-5" color={edge} />
+      </mesh>
+      {fold && (
+        /* bent-up bottom-right corner */
+        <group position={[sw / 2 - flap / 2, -sh / 2 + flap / 2, lift + t / 2]} rotation={[0, 0, Math.PI / 4]}>
+          <mesh rotation={[-0.75, 0, 0]} position={[0, 0, 0.001]}>
+            <shapeGeometry args={[foldShape(flap)]} />
+            <meshStandardMaterial color="#e9d98a" side={THREE.DoubleSide} roughness={0.8} />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+}
+
+function foldShape(f: number) {
+  const d = (f * Math.SQRT2) / 2;
+  const s = new THREE.Shape();
+  s.moveTo(-d, 0);
+  s.lineTo(d, 0);
+  s.lineTo(0, -d);
+  s.closePath();
+  return s;
+}
+
+function Tape3D({ W, H, cx, cy, w, rot, z }: { W: number; H: number; cx: number; cy: number; w: number; rot: number; z: number }) {
+  return (
+    <mesh position={[px(W, cx), py(H, cy), z]} rotation={[0, 0, rot]}>
+      <planeGeometry args={[(w / 1000) * W, (46 / 1400) * H]} />
+      <meshStandardMaterial color="#fff2b3" transparent opacity={0.72} roughness={0.4} depthWrite={false} />
+    </mesh>
+  );
+}
+
+function Staple3D({ W, H, cx, cy, rot, z }: { W: number; H: number; cx: number; cy: number; rot: number; z: number }) {
+  return (
+    <mesh position={[px(W, cx), py(H, cy), z]} rotation={[0, 0, rot]}>
+      <boxGeometry args={[0.07, 0.009, 0.004]} />
+      <meshStandardMaterial color="#b9bec6" metalness={0.85} roughness={0.25} />
+    </mesh>
   );
 }

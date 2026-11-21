@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import * as THREE from "three";
 import { site } from "@/config/site";
 import { Decal, Mug, PaperClip3D, Pencil, Polaroid3D, StickyNote3D, WashiRoll } from "./props";
-import { loadFonts, paintBlobShadow, paintCuttingMat, paintDecal, paintPhoto, paintSticky, paintWashi, readFonts } from "./textures";
+import { loadFonts, paintBlobShadow, paintCuttingMat, paintDecal, paintPhoto, paintSticky, paintTornSheet, paintWashi, readFonts } from "./textures";
 
 type DeskTex = {
   mat: THREE.Texture;
@@ -14,6 +14,8 @@ type DeskTex = {
   blob: THREE.Texture;
   washi: THREE.Texture[];
   decals: THREE.Texture[];
+  sheets: THREE.Texture[];
+  photoC: THREE.Texture;
 };
 
 /** Home-page desk: a green cutting mat with a few things lying around. */
@@ -30,6 +32,8 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
         photoB: paintPhoto(f, "#FFD84D", "the desk", 8),
         sticky: paintSticky(f, `hi! I'm ${site.firstName}. open me →`, "#FFD84D"),
         blob: paintBlobShadow(),
+        sheets: [paintTornSheet("#d9c19a", 3), paintTornSheet("#FBF5E8", 7, true), paintTornSheet("#FFB3C7", 11)],
+        photoC: paintPhoto(f, "#FF755E", "first commit", 21),
         washi: [paintWashi("#FF755E", "stripe"), paintWashi("#477BFF", "dots"), paintWashi("#FFD84D", "check")],
         decals: [
           paintDecal(f, "star", "#FFD84D"),
@@ -66,6 +70,32 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
           <meshBasicMaterial map={tex.blob} transparent opacity={0.7} depthWrite={false} />
         </mesh>
       )}
+
+      {/* layered paper and photos tucked under the diary */}
+      <group position={[0.12, 0.0015, -0.08]} rotation={[0, 0.1, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={shadows}>
+          <planeGeometry args={[2.15, 2.69]} />
+          <meshStandardMaterial map={tex.sheets[0]} transparent alphaTest={0.4} roughness={1} />
+        </mesh>
+      </group>
+      <group position={[-0.7, 0.0035, 0.45]} rotation={[0, 0.38, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={shadows}>
+          <planeGeometry args={[1.2, 1.5]} />
+          <meshStandardMaterial map={tex.sheets[1]} transparent alphaTest={0.4} roughness={1} />
+        </mesh>
+      </group>
+      <group position={[0.7, 0.003, 0.95]} rotation={[0, -0.6, 0]}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={shadows}>
+          <planeGeometry args={[0.7, 0.88]} />
+          <meshStandardMaterial map={tex.sheets[2]} transparent alphaTest={0.4} roughness={1} />
+        </mesh>
+      </group>
+      <group position={[0.92, 0.002, -0.92]} rotation={[0, -0.45, 0]}>
+        <Polaroid3D map={tex.photoC} size={0.62} />
+      </group>
+      <group position={[-0.95, 0.002, -0.75]} rotation={[0, 0.55, 0]}>
+        <Polaroid3D map={tex.photoA} size={0.55} />
+      </group>
 
       {wide && (
         <>
