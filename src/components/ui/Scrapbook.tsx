@@ -86,7 +86,7 @@ export function PostageStamp({
 /** Vinyl star sticker with a white die-cut border. */
 export function StarSticker({ color = "#FFD84D", className }: { color?: string; className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={cn("h-10 w-10", className)} aria-hidden>
+    <svg viewBox="0 0 100 100" className={cn("sticker h-10 w-10", className)} aria-hidden>
       <path
         d="M50 6 61 37 94 38 68 58 77 91 50 72 23 91 32 58 6 38 39 37Z"
         fill={color}

@@ -386,6 +386,7 @@ const CORNER_NOTES: Record<string, string> = {
   "/stack/": "drawer E is empty. for now.",
   "/learning/": "tick a box. it's oddly satisfying.",
   "/contact/": "I always reply. eventually. promise.",
+  "/music/": "turn it up. no, further.",
 };
 
 /** Folded page corner — tug it to turn it up and read what's written underneath. */

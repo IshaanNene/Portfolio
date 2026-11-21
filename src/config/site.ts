@@ -28,6 +28,18 @@ export const site = {
   /** Replace with /images/your-photo.jpg (portrait, ~800×1000). Keep the basePath prefix. */
   photo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/photo-placeholder.svg`,
   photoAlt: "[PLACEHOLDER] Portrait photo",
+  /** Handwritten date next to the cover photo. */
+  photoDate: "'26",
+  /**
+   * Photos lying on the home-page desk, around and under the diary.
+   * Put a jpg in public/images/desk/ and set src, e.g. `${base}/images/desk/workspace.jpg`.
+   * Empty src = painted placeholder.
+   */
+  deskPhotos: [
+    { src: "", caption: "the desk", date: "'26" },
+    { src: "", caption: "first commit", date: "'26" },
+    { src: "", caption: "me + guitar", date: "'26" },
+  ] as { src: string; caption: string; date: string }[],
   location: "[City, Country]",
   /** IANA timezone used by the flip clock on /now. */
   timezone: "Asia/Kolkata",

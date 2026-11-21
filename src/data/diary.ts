@@ -9,7 +9,7 @@ import { learningItems } from "./learning";
  * Pages are generated from the rest of the site data, so they stay in sync.
  */
 
-export type Doodle = "sticky" | "polaroid" | "receipt" | "desk" | "terminal" | "cabinet" | "checklist" | "envelope";
+export type Doodle = "sticky" | "polaroid" | "receipt" | "desk" | "terminal" | "cabinet" | "checklist" | "envelope" | "record";
 
 export type PageFace =
   | { kind: "inside-cover" }
@@ -25,6 +25,7 @@ const palette: Record<string, string> = {
   grass: "#9DDC8B",
   paper: "#FFFFFF",
   cream: "#F5EBD8",
+  pink: "#FFB3C7",
 };
 
 const chapter = (href: string, doodle: Doodle, lines: string[]): PageFace => {
@@ -39,7 +40,8 @@ export const diaryPages: { front: PageFace; back: PageFace }[] = [
   { front: chapter("/projects", "polaroid", projects.slice(0, 3).map((p) => "• " + strip(p.name))), back: chapter("/experience", "receipt", ["printed on a very long receipt", "+ passport of milestones"]) },
   { front: chapter("/about", "desk", ["a desk you can poke around", "+ the scribble page"]), back: chapter("/lab", "terminal", ["$ help", "a real terminal + experiments", "(some folders are classified)"]) },
   { front: chapter("/stack", "cabinet", drawers.slice(0, 4).map((d) => "drawer " + d.code + " — " + d.label)), back: chapter("/learning", "checklist", learningItems.slice(0, 3).map((l, i) => (i === 0 ? "[x] " : "[ ] ") + "goal #" + (i + 1))) },
-  { front: chapter("/contact", "envelope", ["sealed with wax.", "break it to say hi."]), back: { kind: "hint" } },
+  { front: chapter("/contact", "envelope", ["sealed with wax.", "break it to say hi."]), back: chapter("/music", "record", ["on the turntable right now", "+ favourite records", "+ the guitar corner"]) },
+  { front: { kind: "hint" }, back: { kind: "notes" } },
 ];
 
 export type ChapterTab = { href: string; page: string; title: string; color: string; spread: number; side: "left" | "right" };

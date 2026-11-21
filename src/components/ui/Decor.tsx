@@ -26,6 +26,8 @@ export function PaperClip({ className }: { className?: string }) {
         strokeWidth="2.6"
         strokeLinecap="round"
       />
+      {/* metallic glint */}
+      <path d="M16 14 V48 a6 6 0 0 1 -12 0 V10 a4 4 0 0 1 8 0 V44 a2 2 0 0 1 -4 0 V16" fill="none" stroke="#e9edf2" strokeWidth="0.9" strokeLinecap="round" strokeDasharray="5 14 3 30" opacity="0.9" />
     </svg>
   );
 }

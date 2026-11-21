@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import { site } from "@/config/site";
 import { Decal, Mug, PaperClip3D, Pencil, Polaroid3D, StickyNote3D, WashiRoll } from "./props";
-import { loadFonts, paintBlobShadow, paintCuttingMat, paintDecal, paintPhoto, paintSticky, paintTornSheet, paintWashi, readFonts } from "./textures";
+import { loadFonts, paintBlobShadow, paintCuttingMat, paintDecal, paintDeskPhoto, paintInkNote, paintSticky, paintTornSheet, paintWashi, readFonts } from "./textures";
 
 type DeskTex = {
   mat: THREE.Texture;
@@ -16,7 +16,41 @@ type DeskTex = {
   decals: THREE.Texture[];
   sheets: THREE.Texture[];
   photoC: THREE.Texture;
+  graph: THREE.Texture;
+  notes: THREE.Texture[];
 };
+
+/** A sheet of paper that isn't quite flat: one corner lifts and the middle ripples a little. */
+function Sheet({ map, w, h, curl = 0.05, seed = 1 }: { map: THREE.Texture; w: number; h: number; curl?: number; seed?: number }) {
+  const geo = useMemo(() => {
+    const g = new THREE.PlaneGeometry(w, h, 12, 14);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const u = pos.getX(i) / w + 0.5;
+      const v = pos.getY(i) / h + 0.5;
+      const lift = Math.max(0, u + (1 - v) - 1.35);
+      pos.setZ(i, curl * lift * lift * 5 + 0.0025 * Math.sin(u * 7 + seed) * Math.sin(v * 5 + seed));
+    }
+    g.computeVertexNormals();
+    return g;
+  }, [w, h, curl, seed]);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} geometry={geo} receiveShadow castShadow>
+      <meshStandardMaterial map={map} transparent alphaTest={0.4} roughness={1} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+/** Handwriting straight on the mat (or on paper). */
+function InkNote({ map, w = 1.1 }: { map: THREE.Texture; w?: number }) {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]}>
+      <planeGeometry args={[w, (w * 240) / 560]} />
+      <meshBasicMaterial map={map} transparent depthWrite={false} opacity={0.88} toneMapped={false} />
+    </mesh>
+  );
+}
 
 /** Home-page desk: a green cutting mat with a few things lying around. */
 export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; reduced: boolean; wide: boolean }) {
@@ -24,16 +58,27 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
   useEffect(() => {
     let alive = true;
     const f = readFonts();
-    loadFonts(f).then(() => {
+    loadFonts(f).then(async () => {
+      const [pa, pb, pc] = await Promise.all([
+        paintDeskPhoto(f, site.deskPhotos[0], "#477BFF", 3),
+        paintDeskPhoto(f, site.deskPhotos[1], "#FF755E", 21),
+        paintDeskPhoto(f, site.deskPhotos[2], "#FFD84D", 8),
+      ]);
       if (!alive) return;
       setTex({
         mat: paintCuttingMat(f, quality === "high" ? 1 : 0.5),
-        photoA: paintPhoto(f, "#477BFF", "hackathon '2X", 3),
-        photoB: paintPhoto(f, "#FFD84D", "the desk", 8),
+        photoA: pa,
+        photoB: pc,
+        photoC: pb,
         sticky: paintSticky(f, `hi! I'm ${site.firstName}. open me →`, "#FFD84D"),
         blob: paintBlobShadow(),
         sheets: [paintTornSheet("#d9c19a", 3), paintTornSheet("#FBF5E8", 7, true), paintTornSheet("#FFB3C7", 11)],
-        photoC: paintPhoto(f, "#FF755E", "first commit", 21),
+        graph: paintTornSheet("#f4f7ef", 19, false, true),
+        notes: [
+          paintInkNote(f, "works on my machine", "left", "#f5f0e0", 2),
+          paintInkNote(f, "one more experiment...", "left", "#f5f0e0", 5),
+          paintInkNote(f, "don't forget to ship this", "up", "#f5f0e0", 9),
+        ],
         washi: [paintWashi("#FF755E", "stripe"), paintWashi("#477BFF", "dots"), paintWashi("#FFD84D", "check")],
         decals: [
           paintDecal(f, "star", "#FFD84D"),
@@ -71,24 +116,18 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
         </mesh>
       )}
 
-      {/* layered paper and photos tucked under the diary */}
+      {/* background layer: big sheets under the diary, slightly lifted at the corners */}
       <group position={[0.12, 0.0015, -0.08]} rotation={[0, 0.1, 0]}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={shadows}>
-          <planeGeometry args={[2.15, 2.69]} />
-          <meshStandardMaterial map={tex.sheets[0]} transparent alphaTest={0.4} roughness={1} />
-        </mesh>
+        <Sheet map={tex.sheets[0]} w={2.15} h={2.69} curl={0.03} seed={1} />
+      </group>
+      <group position={[-0.62, 0.0028, -0.55]} rotation={[0, -0.22, 0]}>
+        <Sheet map={tex.graph} w={0.9} h={1.12} curl={0.06} seed={4} />
       </group>
       <group position={[-0.7, 0.0035, 0.45]} rotation={[0, 0.38, 0]}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={shadows}>
-          <planeGeometry args={[1.2, 1.5]} />
-          <meshStandardMaterial map={tex.sheets[1]} transparent alphaTest={0.4} roughness={1} />
-        </mesh>
+        <Sheet map={tex.sheets[1]} w={1.2} h={1.5} curl={0.07} seed={2} />
       </group>
       <group position={[0.7, 0.003, 0.95]} rotation={[0, -0.6, 0]}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={shadows}>
-          <planeGeometry args={[0.7, 0.88]} />
-          <meshStandardMaterial map={tex.sheets[2]} transparent alphaTest={0.4} roughness={1} />
-        </mesh>
+        <Sheet map={tex.sheets[2]} w={0.7} h={0.88} curl={0.04} seed={3} />
       </group>
       <group position={[0.92, 0.002, -0.92]} rotation={[0, -0.45, 0]}>
         <Polaroid3D map={tex.photoC} size={0.62} />
@@ -102,17 +141,24 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
           <group position={[-3.05, 0.04, 0.9]} rotation={[0, 0.5, 0]}>
             <Pencil />
           </group>
-          <group position={[2.9, 0.003, -1.3]} rotation={[0, -0.35, 0]}>
-            <Polaroid3D map={tex.photoA} />
-          </group>
-          <group position={[3.25, 0.012, -0.55]} rotation={[0, 0.25, 0]}>
-            <Polaroid3D map={tex.photoB} size={0.6} />
+          <group position={[2.95, 0.003, -1.25]} rotation={[0, -0.35, 0]}>
+            <Polaroid3D map={tex.photoB} />
           </group>
           <group position={[-2.9, 0.003, -1.1]} rotation={[0, 0.2, 0]}>
             <StickyNote3D map={tex.sticky} size={0.75} />
           </group>
           <group position={[2.85, 0.01, 1.2]} rotation={[0, 1.1, 0]}>
             <PaperClip3D />
+          </group>
+          {/* foreground: handwriting added later, pointing at things */}
+          <group position={[-2.55, 0, 1.55]} rotation={[0, 0.08, 0]}>
+            <InkNote map={tex.notes[0]} />
+          </group>
+          <group position={[1.36, 0, 0.5]} rotation={[0, 0.06, 0]}>
+            <InkNote map={tex.notes[1]} w={0.62} />
+          </group>
+          <group position={[-1.5, 0, 1.18]} rotation={[0, 0.05, 0]}>
+            <InkNote map={tex.notes[2]} w={0.8} />
           </group>
           <group position={[-3.4, 0, 2.1]} scale={1.4}>
             <Mug reduced={reduced} />

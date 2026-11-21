@@ -169,6 +169,16 @@
     conic-gradient(from 135deg at right, #0000 25%, #000 0) right / 51% 7px repeat-y;
   pointer-events: none;
   z-index: 2;
+  transition: transform 0.35s var(--ease-paper, ease), filter 0.35s;
+}
+/* tape lifts at the edge when you touch what it's holding */
+:hover > .tape { transform: translateY(-1.5px) rotate(-1.2deg) scaleY(1.06); filter: brightness(1.06); }
+
+/* vinyl stickers tilt a hair on hover */
+.sticker { transition: transform 0.3s cubic-bezier(0.3, 0.7, 0.4, 1.4); }
+.sticker:hover { transform: rotate(-7deg) scale(1.06); }
+@media (prefers-reduced-motion: reduce) {
+  :hover > .tape, .sticker:hover { transform: none; }
 }
 
 .scribble-underline {

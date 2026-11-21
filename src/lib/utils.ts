@@ -6,7 +6,8 @@ export function cn(...parts: (string | false | null | undefined)[]) {
 export function tilt(seed: number | string, max = 3) {
   const n = typeof seed === "number" ? seed : [...seed].reduce((a, c) => a + c.charCodeAt(0), 0);
   const x = Math.sin(n * 12.9898) * 43758.5453;
-  return ((x - Math.floor(x)) * 2 - 1) * max;
+  // rounded so server and client render the same style string
+  return Math.round(((x - Math.floor(x)) * 2 - 1) * max * 100) / 100;
 }
 
 export function seeded(seed: number) {

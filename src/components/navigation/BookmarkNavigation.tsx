@@ -62,29 +62,31 @@ export function BookmarkNavigation() {
         <UtilityButtons />
       </div>
 
-      {/* ── Desktop bookmark ribbons ── */}
+      {/* ── Desktop bookmark ribbons: every label stays fully inside the viewport ── */}
       <nav aria-label="Diary chapters" className="pointer-events-none fixed right-0 top-1/2 z-40 hidden -translate-y-1/2 md:block">
-        <ul className="flex max-h-[92vh] flex-col items-end gap-1.5 overflow-y-auto overflow-x-visible py-2 pl-10 no-scrollbar">
+        <ul className="no-scrollbar flex max-h-[94vh] flex-col items-end gap-1 overflow-y-auto overflow-x-hidden py-2 pl-3">
           {navItems.map((item, i) => {
             const active = isActive(pathname, item.href);
             return (
-              <li key={item.href} style={{ transform: `rotate(${i % 2 ? 0.6 : -0.6}deg)` }}>
+              <li key={item.href} className="relative" style={{ transform: `rotate(${i % 2 ? 0.5 : -0.5}deg)` }}>
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   onMouseEnter={() => play("tick")}
                   className={cn(
-                    "group pointer-events-auto relative flex h-11 w-44 items-center gap-2 border-[3px] border-r-0 border-ink pl-5 pr-3 font-display text-sm font-extrabold uppercase tracking-tight transition-transform duration-300 ease-[var(--ease-paper)]",
+                    "group pointer-events-auto relative flex h-10 items-center gap-2 border-[3px] border-r-0 border-ink pl-5 pr-2 font-display text-[13px] font-extrabold uppercase tracking-tight transition-[width,box-shadow] duration-300 ease-[var(--ease-paper)] [@media(max-height:640px)]:h-8",
                     colorClass[item.color],
-                    active
-                      ? "translate-x-10 shadow-brutal"
-                      : "translate-x-[6.6rem] hover:translate-x-12 focus-visible:translate-x-0 shadow-brutal-sm",
+                    active ? "w-44 shadow-[-5px_5px_0_#171717]" : "w-36 shadow-[-2px_3px_0_#171717] hover:w-40 focus-visible:w-40",
                   )}
                   style={{ clipPath: "polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%)" }}
                 >
                   <span className="font-mono text-[10px] opacity-70">{item.page}</span>
-                  <span>{item.label}</span>
-                  {active && <span className="ml-auto h-2.5 w-2.5 rounded-full border-2 border-ink bg-paper" aria-hidden />}
+                  <span className="whitespace-nowrap">{item.label}</span>
+                  {active && (
+                    <span className="ml-auto grid h-5 w-5 place-items-center rounded-full border-2 border-ink bg-paper" aria-hidden>
+                      <span className="h-1.5 w-1.5 rounded-full bg-ink" />
+                    </span>
+                  )}
                 </Link>
               </li>
             );

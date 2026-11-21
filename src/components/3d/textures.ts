@@ -542,6 +542,105 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
+/** Film grain, a warm light leak and an orange date stamp over a photo area. */
+function filmLook(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, seed: number, date?: string) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  const leak = ctx.createRadialGradient(x + w, y, 0, x + w, y, w * 0.8);
+  leak.addColorStop(0, "rgba(255,170,90,0.28)");
+  leak.addColorStop(1, "rgba(255,170,90,0)");
+  ctx.fillStyle = leak;
+  ctx.fillRect(x, y, w, h);
+  const r = seeded(seed);
+  for (let i = 0; i < (w * h) / 90; i++) {
+    ctx.fillStyle = r() > 0.5 ? `rgba(255,255,255,${r() * 0.08})` : `rgba(0,0,0,${r() * 0.1})`;
+    ctx.fillRect(x + r() * w, y + r() * h, 1.4, 1.4);
+  }
+  const v = ctx.createRadialGradient(x + w / 2, y + h / 2, w * 0.3, x + w / 2, y + h / 2, w * 0.8);
+  v.addColorStop(0, "rgba(0,0,0,0)");
+  v.addColorStop(1, "rgba(30,15,0,0.25)");
+  ctx.fillStyle = v;
+  ctx.fillRect(x, y, w, h);
+  if (date) {
+    ctx.fillStyle = "rgba(255,140,40,0.9)";
+    ctx.font = "700 18px ui-monospace, monospace";
+    ctx.textAlign = "right";
+    ctx.fillText(date, x + w - 10, y + h - 10);
+  }
+  ctx.restore();
+}
+
+/** Desk Polaroid: loads `src` if it exists, otherwise paints a placeholder scene. */
+export async function paintDeskPhoto(f: Fonts, p: { src?: string; caption: string; date?: string }, bg: string, seed: number) {
+  const { c, ctx } = canvas(1.2, 320, 380);
+  ctx.fillStyle = "#fbfbf7";
+  ctx.fillRect(0, 0, 320, 380);
+  grain(ctx, 320, 380, 900, seed, "60,50,30");
+  const img = p.src ? await loadImage(p.src) : null;
+  if (img) drawCover(ctx, img, 18, 18, 284, 270);
+  else {
+    const r = seeded(seed);
+    ctx.fillStyle = bg;
+    ctx.fillRect(18, 18, 284, 270);
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.beginPath();
+    ctx.arc(80 + r() * 160, 90 + r() * 40, 30 + r() * 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(23,23,23,0.75)";
+    ctx.beginPath();
+    ctx.moveTo(18, 288);
+    ctx.lineTo(120 + r() * 40, 160 + r() * 40);
+    ctx.lineTo(200, 230);
+    ctx.lineTo(250, 190);
+    ctx.lineTo(302, 260);
+    ctx.lineTo(302, 288);
+    ctx.closePath();
+    ctx.fill();
+  }
+  filmLook(ctx, 18, 18, 284, 270, seed + 3, p.date ? p.date.replace(/^\[|\]$/g, "") : undefined);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(18, 18, 284, 270);
+  ctx.fillStyle = INK;
+  ctx.font = `700 34px ${f.hand}`;
+  ctx.fillText(p.caption, 26, 340);
+  return toTexture(c, 4);
+}
+
+/** Handwritten note straight on the desk, with an optional arrow toward something. */
+export function paintInkNote(f: Fonts, text: string, arrow: "left" | "right" | "up" | "down" | null, color = "#f5f0e0", seed = 1) {
+  const W = 560;
+  const H = 240;
+  const { c, ctx } = canvas(1, W, H);
+  const r = seeded(seed);
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.font = `700 54px ${f.hand}`;
+  ctx.fillText(text, 30, 90);
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  const tw = Math.min(ctx.measureText(text).width, W - 60);
+  sketchLine(ctx, r, 34, 108, 30 + tw * 0.7, 106, 2);
+  if (arrow) {
+    const [sx, sy, ex, ey] =
+      arrow === "left" ? [140, 150, 30, 215] : arrow === "right" ? [380, 150, 520, 215] : arrow === "down" ? [260, 130, 230, 230] : [Math.min(tw + 50, 470), 78, 548, 14];
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.quadraticCurveTo((sx + ex) / 2 + 40, (sy + ey) / 2 - 30, ex, ey);
+    ctx.stroke();
+    const a = Math.atan2(ey - sy, ex - sx);
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - Math.cos(a - 0.5) * 26, ey - Math.sin(a - 0.5) * 26);
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - Math.cos(a + 0.5) * 26, ey - Math.sin(a + 0.5) * 26);
+    ctx.stroke();
+  }
+  return toTexture(c, 4);
+}
+
 function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
   const ir = img.width / img.height;
   const r = w / h;
@@ -882,6 +981,31 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
       }
       break;
     }
+    case "record": {
+      // a record sliding out of its sleeve
+      ctx.fillStyle = INK;
+      ctx.beginPath();
+      ctx.arc(290, 150, 130, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 2;
+      for (let k = 0; k < 6; k++) {
+        ctx.beginPath();
+        ctx.arc(290, 150, 60 + k * 11, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(290, 150, 40, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#FFB3C7";
+      ctx.fillRect(20, 20, 260, 260);
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 5;
+      sketchRect(ctx, r, 20, 20, 260, 260, 2);
+      sketchLine(ctx, r, 60, 230, 200, 230, 1);
+      break;
+    }
     case "envelope": {
       ctx.fillStyle = "#C8A374";
       ctx.fillRect(0, 40, 380, 240);
@@ -1154,29 +1278,86 @@ export function paintCuttingMat(f: Fonts, scale: number) {
   const W = 1800;
   const H = 1200;
   const { c, ctx } = canvas(scale, W, H);
+  const r = seeded(77);
   ctx.fillStyle = "#3f8f5a";
   ctx.fillRect(0, 0, W, H);
-  grain(ctx, W, H, 12000, 21, "0,30,10");
+  // uneven dye + soft window light from the top-left
+  for (let i = 0; i < 26; i++) {
+    const x = r() * W;
+    const y = r() * H;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 120 + r() * 260);
+    g.addColorStop(0, r() > 0.5 ? "rgba(20,60,35,0.10)" : "rgba(120,190,140,0.07)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+  }
+  const light = ctx.createLinearGradient(0, 0, W, H);
+  light.addColorStop(0, "rgba(255,248,225,0.16)");
+  light.addColorStop(0.55, "rgba(255,248,225,0)");
+  light.addColorStop(1, "rgba(0,20,10,0.14)");
+  ctx.fillStyle = light;
+  ctx.fillRect(0, 0, W, H);
+  grain(ctx, W, H, 16000, 21, "0,30,10");
+  // grid — present, but quiet
   const cell = 50;
   for (let x = 0; x <= W; x += cell) {
-    ctx.fillStyle = x % (cell * 5) === 0 ? "rgba(230,255,235,0.42)" : "rgba(230,255,235,0.18)";
-    ctx.fillRect(x, 0, x % (cell * 5) === 0 ? 2.5 : 1.2, H);
+    const major = x % (cell * 5) === 0;
+    ctx.fillStyle = major ? "rgba(230,255,235,0.22)" : "rgba(230,255,235,0.08)";
+    ctx.fillRect(x, 0, major ? 2 : 1, H);
   }
   for (let y = 0; y <= H; y += cell) {
-    ctx.fillStyle = y % (cell * 5) === 0 ? "rgba(230,255,235,0.42)" : "rgba(230,255,235,0.18)";
-    ctx.fillRect(0, y, W, y % (cell * 5) === 0 ? 2.5 : 1.2);
+    const major = y % (cell * 5) === 0;
+    ctx.fillStyle = major ? "rgba(230,255,235,0.22)" : "rgba(230,255,235,0.08)";
+    ctx.fillRect(0, y, W, major ? 2 : 1);
   }
-  ctx.strokeStyle = "rgba(230,255,235,0.3)";
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(230,255,235,0.14)";
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(0, H);
   ctx.lineTo(H, 0);
   ctx.stroke();
-  ctx.fillStyle = "rgba(230,255,235,0.55)";
-  ctx.font = `500 18px ${f.mono}`;
+  ctx.fillStyle = "rgba(230,255,235,0.32)";
+  ctx.font = `500 16px ${f.mono}`;
   for (let x = cell * 2; x < W; x += cell * 2) ctx.fillText(String(x / cell), x + 4, 22);
   for (let y = cell * 2; y < H; y += cell * 2) ctx.fillText(String(y / cell), 6, y - 4);
-  vignette(ctx, W, H, 0.45);
+  // knife cuts: straight, pale, mostly along the grid
+  for (let i = 0; i < 38; i++) {
+    const horiz = r() > 0.45;
+    const x = r() * W;
+    const y = r() * H;
+    const len = 60 + r() * 380;
+    ctx.strokeStyle = `rgba(210,240,215,${0.12 + r() * 0.2})`;
+    ctx.lineWidth = 0.8 + r() * 0.9;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(horiz ? x + len : x + jitter(r, 6), horiz ? y + jitter(r, 6) : y + len);
+    ctx.stroke();
+  }
+  // fine scuffs
+  for (let i = 0; i < 260; i++) {
+    const x = r() * W;
+    const y = r() * H;
+    const a = r() * Math.PI;
+    const l = 6 + r() * 26;
+    ctx.strokeStyle = `rgba(220,250,225,${0.04 + r() * 0.08})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l);
+    ctx.stroke();
+  }
+  // worn, slightly shiny patch where the diary usually sits
+  const worn = ctx.createRadialGradient(W * 0.5, H * 0.5, 40, W * 0.5, H * 0.5, 520);
+  worn.addColorStop(0, "rgba(150,210,165,0.10)");
+  worn.addColorStop(1, "rgba(150,210,165,0)");
+  ctx.fillStyle = worn;
+  ctx.fillRect(0, 0, W, H);
+  // an old ink spot
+  ctx.fillStyle = "rgba(15,25,60,0.25)";
+  ctx.beginPath();
+  ctx.ellipse(W * 0.83, H * 0.78, 14, 10, 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  vignette(ctx, W, H, 0.5);
   return toTexture(c);
 }
 
@@ -1473,12 +1654,16 @@ export async function paintCoverPhoto(f: Fonts) {
     ctx.fillStyle = "#9DDC8B";
     ctx.fillRect(22, 22, 306, 316);
   }
+  filmLook(ctx, 22, 22, 306, 316, 5);
   ctx.strokeStyle = INK;
   ctx.lineWidth = 4;
   ctx.strokeRect(22, 22, 306, 316);
   ctx.fillStyle = INK;
-  ctx.font = `700 46px ${f.hand}`;
-  ctx.fillText("that's me ↑", 60, 392);
+  ctx.font = `700 44px ${f.hand}`;
+  ctx.fillText("that's me ↑", 40, 392);
+  ctx.fillStyle = "rgba(71,123,255,0.85)";
+  ctx.font = `600 26px ${f.hand}`;
+  ctx.fillText(site.photoDate, 236, 396);
   ctx.strokeStyle = INK;
   ctx.lineWidth = 8;
   ctx.strokeRect(0, 0, W, H);
@@ -1511,7 +1696,7 @@ export function paintCoverNote(f: Fonts) {
 }
 
 /** Loose sheet with torn edges and transparent surroundings. */
-export function paintTornSheet(color: string, seed: number, lines = false) {
+export function paintTornSheet(color: string, seed: number, lines = false, graph = false) {
   const W = 512;
   const H = 640;
   const { c, ctx } = canvas(1, W, H);
@@ -1530,6 +1715,22 @@ export function paintTornSheet(color: string, seed: number, lines = false) {
   ctx.save();
   ctx.clip();
   grain(ctx, W, H, 4000, seed, "80,55,20");
+  if (graph) {
+    ctx.strokeStyle = "rgba(60,140,120,0.28)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 22) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 22) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+  }
   if (lines) {
     ctx.strokeStyle = "rgba(71,123,255,0.3)";
     ctx.lineWidth = 2;

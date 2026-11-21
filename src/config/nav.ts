@@ -2,7 +2,7 @@ export type NavItem = {
   href: string;
   label: string;
   page: string;
-  color: "sun" | "electric" | "coral" | "grass" | "paper" | "cream";
+  color: "sun" | "electric" | "coral" | "grass" | "paper" | "cream" | "pink";
   blurb: string;
 };
 
@@ -16,6 +16,7 @@ export const navItems: NavItem[] = [
   { href: "/stack", label: "Stack", page: "07", color: "sun", blurb: "the filing cabinet" },
   { href: "/learning", label: "Learning", page: "08", color: "coral", blurb: "the to-do notebook" },
   { href: "/contact", label: "Contact", page: "09", color: "grass", blurb: "a sealed envelope" },
+  { href: "/music", label: "Music", page: "10", color: "pink", blurb: "records, guitar & what's on" },
 ];
 
 export const colorClass: Record<NavItem["color"], string> = {
@@ -25,4 +26,5 @@ export const colorClass: Record<NavItem["color"], string> = {
   grass: "bg-grass",
   paper: "bg-paper",
   cream: "bg-cream",
+  pink: "bg-[#FFB3C7]",
 };
