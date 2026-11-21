@@ -105,7 +105,7 @@ function gutter(ctx: CanvasRenderingContext2D, side: "left" | "right") {
 }
 
 function ruled(ctx: CanvasRenderingContext2D, top = 190, gap = 58, margin = 120) {
-  ctx.strokeStyle = "rgba(71,123,255,0.28)";
+  ctx.strokeStyle = "rgba(62,92,118,0.28)";
   ctx.lineWidth = 2;
   for (let y = top; y < PAGE_H - 60; y += gap) {
     ctx.beginPath();
@@ -113,7 +113,7 @@ function ruled(ctx: CanvasRenderingContext2D, top = 190, gap = 58, margin = 120)
     ctx.lineTo(PAGE_W, y);
     ctx.stroke();
   }
-  ctx.strokeStyle = "rgba(255,117,94,0.6)";
+  ctx.strokeStyle = "rgba(210,105,58,0.6)";
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(margin, 0);
@@ -333,7 +333,7 @@ function postageStamp(
   ctx.lineTo(w - 14, 140);
   ctx.lineTo(14, 140);
   ctx.fill();
-  ctx.fillStyle = color === "#477BFF" ? "#FFFFFF" : INK;
+  ctx.fillStyle = color === "#3E5C76" ? "#FFFFFF" : INK;
   ctx.font = `800 34px ${f.display}`;
   ctx.fillText(value, 22, 50);
   ctx.font = `500 13px ${f.mono}`;
@@ -392,7 +392,7 @@ function ticketStub(ctx: CanvasRenderingContext2D, f: Fonts, x: number, y: numbe
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.strokeRect(10, 10, 226, h - 20);
-  const ink = color === "#477BFF" ? "#FFFFFF" : INK;
+  const ink = color === "#3E5C76" ? "#FFFFFF" : INK;
   ctx.fillStyle = ink;
   ctx.font = `500 15px ${f.mono}`;
   ctx.fillText("ADMIT ONE · VISITOR", 24, 38);
@@ -495,10 +495,10 @@ function paperClip(ctx: CanvasRenderingContext2D, x: number, y: number, rot: num
 }
 
 const WASHI: { color: string; pattern: Pattern }[] = [
-  { color: "#FF755E", pattern: "stripe" },
-  { color: "#477BFF", pattern: "dots" },
-  { color: "#9DDC8B", pattern: "grid" },
-  { color: "#FFD84D", pattern: "check" },
+  { color: "#D2693A", pattern: "stripe" },
+  { color: "#3E5C76", pattern: "dots" },
+  { color: "#8FA05A", pattern: "grid" },
+  { color: "#D9A441", pattern: "check" },
 ];
 
 /** Tape the outer top corner of a page with washi. */
@@ -510,7 +510,7 @@ function cornerWashi(ctx: CanvasRenderingContext2D, side: "left" | "right", n: n
 
 /** The scrapbook extras on a chapter page, placed in the free lower-left area. */
 function chapterScraps(ctx: CanvasRenderingContext2D, f: Fonts, r: () => number, side: "left" | "right", pageNo: number, color: string, title: string) {
-  const accent = color === "#FFFFFF" ? "#FFD84D" : color;
+  const accent = color === "#FFFFFF" ? "#D9A441" : color;
   const v = pageNo % 4;
   if (v === 0) {
     ticketStub(ctx, f, 140, 900, -0.08, accent, title, pageNo);
@@ -518,12 +518,12 @@ function chapterScraps(ctx: CanvasRenderingContext2D, f: Fonts, r: () => number,
   } else if (v === 1) {
     postageStamp(ctx, f, 170, 860, -0.1, accent, String(10 + pageNo * 5) + "¢", title);
   } else if (v === 2) {
-    miniPolaroid(ctx, f, r, 160, 840, 0.07, accent, title.toLowerCase() + " ♥");
+    miniPolaroid(ctx, f, r, 160, 840, 0.07, accent, title.toLowerCase());
     washi(ctx, 275, 840, 140, -0.12, WASHI[pageNo % 4].color, WASHI[pageNo % 4].pattern, 44);
   } else {
     tornPaper(ctx, r, 140, 860, 330, 220, accent, 0.95);
     paperClip(ctx, 400, 820, 0.25);
-    ctx.fillStyle = accent === "#477BFF" ? "#FFFFFF" : INK;
+    ctx.fillStyle = accent === "#3E5C76" ? "#FFFFFF" : INK;
     ctx.font = `700 44px ${f.hand}`;
     ["note to self:", "keep it weird,", "keep shipping."].forEach((l, i) => ctx.fillText(l, 170, 930 + i * 52));
   }
@@ -653,198 +653,270 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: numb
 
 /* ───────────── COVER ───────────── */
 
+/* ───────────── LEATHER ───────────── */
+
+const LEATHER = "#573420";
+const STITCH = "rgba(214,178,128,0.75)";
+
+/** Worn, scuffed brown leather: mottling, creases, scratches, pores and burnished edges. */
+/** Poly Haven "Brown Leather" scan by Rob Tuytel (CC0) — see public/textures/leather/LICENSE.txt. */
+export const leatherMapUrl = (map: "albedo" | "nor_gl" | "rough") =>
+  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/textures/leather/brown_leather_${map}_1k.jpg`;
+/** One scan tile covers this many canvas units; the normal/roughness maps repeat to match. */
+export const LEATHER_TILE = 480;
+
+function leather(ctx: CanvasRenderingContext2D, w: number, h: number, seed: number, base = LEATHER, detail = 1, scan: HTMLImageElement | null = null) {
+  const r = seeded(seed);
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, w, h);
+  if (scan) {
+    // real photographed leather as the base, darkened and warmed to match
+    const pat = ctx.createPattern(scan, "repeat");
+    if (pat) {
+      pat.setTransform(new DOMMatrix().scale(LEATHER_TILE / scan.width));
+      ctx.fillStyle = pat;
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "multiply";
+      ctx.fillStyle = base === LEATHER ? "#e6b48a" : "#7a5a44";
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "source-over";
+      detail *= 0.45; // the scan already carries most of the grain
+    }
+  }
+  // broad tonal variation — rubbed lighter patches and darker oily ones
+  const blobs = Math.round(60 * detail);
+  for (let i = 0; i < blobs; i++) {
+    const x = r() * w;
+    const y = r() * h;
+    const rad = (0.08 + r() * 0.3) * Math.max(w, h);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, rad);
+    const light = r() > 0.38;
+    g.addColorStop(0, light ? `rgba(168,108,58,${0.1 + r() * 0.16})` : `rgba(22,11,4,${0.1 + r() * 0.16})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+  // pores / pebble grain
+  for (let i = 0; i < 26000 * detail * (w * h) / (PAGE_W * PAGE_H); i++) {
+    ctx.fillStyle = r() > 0.5 ? `rgba(0,0,0,${0.06 + r() * 0.1})` : `rgba(190,130,70,${0.03 + r() * 0.06})`;
+    ctx.fillRect(r() * w, r() * h, 1 + r() * 2, 1 + r() * 2);
+  }
+  // creases: a dark fold with a lighter ridge beside it
+  const creases = Math.round(34 * detail);
+  for (let i = 0; i < creases; i++) {
+    let x = r() * w;
+    let y = r() * h;
+    const len = 40 + r() * 260;
+    let a = r() * Math.PI * 2;
+    const pts: [number, number][] = [[x, y]];
+    for (let d = 0; d < len; d += 14) {
+      a += (r() - 0.5) * 0.7;
+      x += Math.cos(a) * 14;
+      y += Math.sin(a) * 14;
+      pts.push([x, y]);
+    }
+    const lw = 1 + r() * 2.5;
+    for (const [off, col] of [[0, `rgba(12,6,2,${0.25 + r() * 0.25})`], [lw + 0.8, `rgba(196,140,82,${0.1 + r() * 0.12})`]] as const) {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = lw;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      pts.forEach(([px, py], j) => (j ? ctx.lineTo(px + off, py + off) : ctx.moveTo(px + off, py + off)));
+      ctx.stroke();
+    }
+  }
+  // scratches and scuffs — short pale strokes where the top grain is worn through
+  const scratches = Math.round(420 * detail);
+  for (let i = 0; i < scratches; i++) {
+    const x = r() * w;
+    const y = r() * h;
+    const a = r() * Math.PI * 2;
+    const l = 6 + r() * 60;
+    ctx.strokeStyle = `rgba(${200 + r() * 30},${140 + r() * 30},${80 + r() * 30},${0.12 + r() * 0.3})`;
+    ctx.lineWidth = 0.6 + r() * 1.8;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + Math.cos(a) * l * 0.5 + (r() - 0.5) * 10, y + Math.sin(a) * l * 0.5 + (r() - 0.5) * 10, x + Math.cos(a) * l, y + Math.sin(a) * l);
+    ctx.stroke();
+  }
+  // a few bigger rubbed scuffs
+  for (let i = 0; i < 10 * detail; i++) {
+    ctx.save();
+    ctx.translate(r() * w, r() * h);
+    ctx.rotate(r() * Math.PI);
+    ctx.scale(1, 0.25 + r() * 0.3);
+    const rad = 20 + r() * 60;
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rad);
+    g.addColorStop(0, `rgba(176,116,62,${0.18 + r() * 0.2})`);
+    g.addColorStop(1, "rgba(176,116,62,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, rad, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  // darker, handled edges
+  const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.max(w, h) * 0.72);
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, "rgba(10,4,0,0.38)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function stitches(ctx: CanvasRenderingContext2D, pts: [number, number][], len = 14, gap = 9) {
+  ctx.save();
+  ctx.setLineDash([len, gap]);
+  ctx.lineCap = "round";
+  // stitch holes / shadow first, thread on top
+  for (const [off, col, lw] of [[1.5, "rgba(10,4,0,0.55)", 4.5], [0, STITCH, 3]] as const) {
+    ctx.strokeStyle = col;
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    pts.forEach(([x, y], i) => (i ? ctx.lineTo(x + off, y + off) : ctx.moveTo(x + off, y + off)));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/** Text pressed into the leather: dark recess with a light lower lip. */
+function deboss(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, foil?: string) {
+  ctx.fillStyle = "rgba(205,150,92,0.28)";
+  ctx.fillText(text, x + 1.5, y + 2);
+  ctx.fillStyle = "rgba(8,3,0,0.7)";
+  ctx.fillText(text, x - 1, y - 1.5);
+  ctx.fillStyle = foil ?? "rgba(30,15,6,0.85)";
+  ctx.fillText(text, x, y);
+}
+
+function rivet(ctx: CanvasRenderingContext2D, x: number, y: number, rad = 13) {
+  const g = ctx.createRadialGradient(x - rad * 0.35, y - rad * 0.35, 1, x, y, rad);
+  g.addColorStop(0, "#f6e3a8");
+  g.addColorStop(0.45, "#c9a14f");
+  g.addColorStop(1, "#5e4317");
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
+  ctx.beginPath();
+  ctx.arc(x + 2, y + 3, rad, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, rad, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** Small tileable leather swatch for the back board, spine and board edges. */
+export async function paintLeather(scale: number, base = LEATHER, seed = 9) {
+  const { c, ctx } = canvas(scale, LEATHER_TILE * 2, LEATHER_TILE * 2);
+  leather(ctx, LEATHER_TILE * 2, LEATHER_TILE * 2, seed, base, 0.6, await loadImage(leatherMapUrl("albedo")));
+  return toTexture(c, 4);
+}
+
+/* ───────────── COVER ───────────── */
+
 export async function paintCover(f: Fonts, scale: number, layered = false): Promise<Painted> {
   const { c, ctx } = canvas(scale);
   const r = seeded(11);
+  leather(ctx, PAGE_W, PAGE_H, 23, LEATHER, 1, await loadImage(leatherMapUrl("albedo")));
 
-  // cloth
-  ctx.fillStyle = "#FF755E";
-  ctx.fillRect(0, 0, PAGE_W, PAGE_H);
-  for (let y = 0; y < PAGE_H; y += 3) {
-    ctx.fillStyle = `rgba(0,0,0,${0.02 + r() * 0.03})`;
-    ctx.fillRect(0, y, PAGE_W, 1);
-  }
-  for (let x = 0; x < PAGE_W; x += 3) {
-    ctx.fillStyle = `rgba(255,255,255,${0.015 + r() * 0.03})`;
-    ctx.fillRect(x, 0, 1, PAGE_H);
-  }
-  grain(ctx, PAGE_W, PAGE_H, 7000, 12, "40,0,0");
+  // hinge groove next to the spine
+  const hg = ctx.createLinearGradient(0, 0, 110, 0);
+  hg.addColorStop(0, "rgba(8,3,0,0.55)");
+  hg.addColorStop(0.55, "rgba(8,3,0,0.1)");
+  hg.addColorStop(0.62, "rgba(200,140,80,0.12)");
+  hg.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = hg;
+  ctx.fillRect(0, 0, 110, PAGE_H);
 
-  // spine-side band (dark cloth)
-  ctx.fillStyle = INK;
-  ctx.fillRect(0, 0, 70, PAGE_H);
-  ctx.fillStyle = "rgba(255,255,255,0.06)";
-  for (let y = 0; y < PAGE_H; y += 4) ctx.fillRect(0, y, 70, 1);
-  ctx.strokeStyle = "rgba(255,255,255,0.35)";
-  ctx.setLineDash([14, 10]);
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(84, 20);
-  ctx.lineTo(84, PAGE_H - 20);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // saddle stitching around the border
+  stitches(ctx, [[96, 34], [PAGE_W - 34, 34], [PAGE_W - 34, PAGE_H - 34], [96, PAGE_H - 34], [96, 34]]);
 
-  // top strip
-  ctx.fillStyle = INK;
-  ctx.font = `500 30px ${f.mono}`;
-  ctx.fillText("VOL. 01  ·  DEV DIARY  ·  2026", 130, 92);
-
-  if (!layered) {
-  // name label
+  // the wrap-around flap on the fore-edge, riveted, with its own stitched edge
   ctx.save();
-  ctx.translate(130, 150);
-  ctx.rotate(-0.025);
-  brutalBox(ctx, 0, 0, 740, 300, "#FFD84D", 16, 9);
-  ctx.fillStyle = INK;
+  const flap = new Path2D();
+  flap.moveTo(PAGE_W, 470);
+  flap.bezierCurveTo(930, 500, 860, 560, 875, 700);
+  flap.bezierCurveTo(888, 820, 940, 880, PAGE_W, 900);
+  flap.closePath();
+  ctx.shadowColor = "rgba(0,0,0,0.6)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetX = -6;
+  ctx.shadowOffsetY = 6;
+  ctx.fillStyle = "#3d2313";
+  ctx.fill(flap);
+  ctx.restore();
+  ctx.save();
+  ctx.clip(flap);
+  const fl = ctx.createLinearGradient(870, 0, PAGE_W, 0);
+  fl.addColorStop(0, "rgba(170,110,60,0.35)");
+  fl.addColorStop(1, "rgba(0,0,0,0.2)");
+  ctx.fillStyle = fl;
+  ctx.fillRect(860, 460, 140, 450);
+  for (let i = 0; i < 40; i++) {
+    ctx.strokeStyle = `rgba(210,150,90,${0.1 + r() * 0.25})`;
+    ctx.lineWidth = 1;
+    const x = 880 + r() * 120;
+    const y = 480 + r() * 400;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (r() - 0.5) * 40, y + (r() - 0.5) * 20);
+    ctx.stroke();
+  }
+  ctx.restore();
+  stitches(ctx, [[PAGE_W, 498], [942, 524], [902, 590], [903, 700], [912, 805], [950, 860], [PAGE_W, 872]], 10, 8);
+  rivet(ctx, 930, 640);
+  rivet(ctx, 930, 760);
+
+  // debossed header line
   ctx.font = `500 26px ${f.mono}`;
-  ctx.fillText("PROPERTY OF —", 36, 60);
-  ctx.font = `800 118px ${f.display}`;
-  const name = site.name.toUpperCase();
-  const parts = name.split(" ");
-  const fit = (s: string, max: number, size: number) => {
-    let sz = size;
-    ctx.font = `800 ${sz}px ${f.display}`;
-    while (ctx.measureText(s).width > max && sz > 40) {
-      sz -= 4;
-      ctx.font = `800 ${sz}px ${f.display}`;
-    }
-    return sz;
-  };
-  if (parts.length > 1) {
-    fit(parts[0], 660, 118);
-    ctx.fillText(parts[0], 34, 160);
-    fit(parts.slice(1).join(" "), 660, 118);
-    ctx.fillText(parts.slice(1).join(" "), 34, 262);
-  } else {
-    fit(name, 660, 140);
-    ctx.fillText(name, 34, 210);
-  }
-  ctx.restore();
-
-  }
-
-  // role ribbon
-  ctx.save();
-  ctx.translate(150, 500);
-  ctx.rotate(0.02);
-  const role = site.role.replace(/\[|\]/g, "");
-  ctx.font = `700 30px ${f.mono}`;
-  const rw = Math.min(700, ctx.measureText(role).width + 50);
-  brutalBox(ctx, 0, -44, rw, 64, INK, 0, 0);
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillText(role.length > 38 ? role.slice(0, 37) + "…" : role, 24, 0);
-  ctx.restore();
+  deboss(ctx, "VOL. 01   ·   DEV DIARY   ·   2026", 140, 98);
+  ctx.strokeStyle = "rgba(8,3,0,0.5)";
+  ctx.lineWidth = 2;
+  sketchLine(ctx, r, 140, 116, 860, 116, 1);
 
   if (!layered) {
-  // photo polaroid
-  const img = await loadImage(site.photo);
-  ctx.save();
-  ctx.translate(560, 610);
-  ctx.rotate(0.06);
-  brutalBox(ctx, 0, 0, 350, 420, "#FFFFFF", 14, 7);
-  if (img) drawCover(ctx, img, 22, 22, 306, 316);
-  else {
-    ctx.fillStyle = "#9DDC8B";
-    ctx.fillRect(22, 22, 306, 316);
-  }
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 4;
-  ctx.strokeRect(22, 22, 306, 316);
-  ctx.fillStyle = INK;
-  ctx.font = `700 46px ${f.hand}`;
-  ctx.fillText("that's me ↑", 60, 392);
-  ctx.restore();
-  tape(ctx, 735, 612, 190, -0.12);
-
-  // handwritten note on sticky
-  ctx.save();
-  ctx.translate(140, 640);
-  ctx.rotate(-0.05);
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.fillRect(10, 14, 380, 360);
-  ctx.fillStyle = "#FFF4B8";
-  ctx.fillRect(0, 0, 380, 360);
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0, 0, 380, 40);
-  ctx.fillStyle = INK;
-  ctx.font = `700 46px ${f.hand}`;
-  const note = site.coverNote.replace(/\[PLACEHOLDER\]\s*/g, "");
-  wrap(ctx, note, 330)
-    .slice(0, 6)
-    .forEach((l, i) => ctx.fillText(l, 24, 92 + i * 50));
-  ctx.restore();
-  tape(ctx, 330, 640, 140, 0.18);
+    ctx.font = `800 110px ${f.display}`;
+    deboss(ctx, site.name.toUpperCase(), 140, 300);
   }
 
-  // doodles
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  star(ctx, 900, 540, 34, "#FFD84D");
-  star(ctx, 120, 1110, 26, "#FFFFFF");
-  ctx.lineWidth = 5;
-  sketchLine(ctx, r, 470, 600, 540, 660, 4);
-  sketchLine(ctx, r, 520, 640, 545, 665, 2);
-  sketchLine(ctx, r, 548, 662, 520, 668, 2);
-  // scrapbook extras: washi tape on the corners
-  washi(ctx, 940, 40, 240, 0.7, "#FFD84D", "check");
-  washi(ctx, 160, 1350, 220, -0.35, "#9DDC8B", "grid", 50);
-  washi(ctx, 520, 1060, 150, 0.25, "#477BFF", "stripe", 44);
+  // role — foil-stamped under the nameplate
+  const role = site.role.replace(/\[|\]/g, "").toUpperCase();
+  ctx.font = `700 30px ${f.mono}`;
+  deboss(ctx, role.length > 38 ? role.slice(0, 37) + "…" : role, 150, 520, "#c9a45c");
 
-  // printed stickers
+  // blind-tooled medallion with </> pressed into the leather
   ctx.save();
   ctx.translate(250, 1180);
-  ctx.rotate(-0.25);
-  ctx.fillStyle = "#FFFFFF";
-  ctx.beginPath();
-  ctx.arc(0, 0, 82, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#477BFF";
-  ctx.beginPath();
-  ctx.arc(0, 0, 70, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.lineWidth = 4;
-  ctx.stroke();
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = `700 58px ${f.mono}`;
+  for (const [off, col] of [[2, "rgba(205,150,92,0.25)"], [-1.5, "rgba(8,3,0,0.65)"]] as const) {
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(off, off, 86, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(off, off, 70, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.font = `700 56px ${f.mono}`;
   ctx.textAlign = "center";
-  ctx.fillText("</>", 0, 20);
+  deboss(ctx, "</>", 0, 20, "#b8924e");
   ctx.restore();
   ctx.textAlign = "left";
 
-  ctx.save();
-  ctx.translate(430, 1200);
-  ctx.rotate(0.08);
-  brutalBox(ctx, 0, 0, 230, 78, "#9DDC8B", 8, 5);
-  ctx.fillStyle = INK;
-  ctx.font = `800 38px ${f.display}`;
-  ctx.fillText("SHIP IT", 32, 54);
-  ctx.restore();
+  // foil title along the bottom
+  ctx.font = `800 54px ${f.display}`;
+  deboss(ctx, "FIELD NOTES", 400, 1210, "#c9a45c");
+  ctx.font = `500 22px ${f.mono}`;
+  deboss(ctx, "BUILD  ·  BREAK  ·  WRITE IT DOWN", 404, 1256);
+  ctx.font = `500 20px ${f.mono}`;
+  deboss(ctx, "Nº 001 — 2026", 404, 1300);
 
-  // barcode
-  const bx = 720;
-  const by = 1250;
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(bx - 14, by - 14, 230, 112);
-  let x = bx;
-  for (let i = 0; x < bx + 200; i++) {
-    const w = 2 + Math.floor(r() * 7);
-    if (i % 2 === 0) {
-      ctx.fillStyle = INK;
-      ctx.fillRect(x, by, w, 64);
-    }
-    x += w;
+  // corner scuffs where the cover gets handled most
+  for (const [x, y] of [[PAGE_W, 0], [PAGE_W, PAGE_H], [0, PAGE_H]]) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 150);
+    g.addColorStop(0, "rgba(150,96,50,0.45)");
+    g.addColorStop(1, "rgba(150,96,50,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, PAGE_W, PAGE_H);
   }
-  ctx.fillStyle = INK;
-  ctx.font = `500 18px ${f.mono}`;
-  ctx.fillText("0 0 1 — 2 0 2 6", bx, by + 88);
-
-  // wear
-  vignette(ctx, PAGE_W, PAGE_H, 0.35);
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
-  ctx.lineWidth = 2;
-  for (let i = 0; i < 30; i++) sketchLine(ctx, r, r() * PAGE_W, r() * PAGE_H, r() * PAGE_W, r() * PAGE_H, 30);
-
   return { texture: toTexture(c), links: [] };
 }
 
@@ -862,7 +934,7 @@ function readButton(ctx: CanvasRenderingContext2D, f: Fonts, label: string, x: n
   ctx.font = `800 40px ${f.display}`;
   const w = ctx.measureText(label).width + 70;
   brutalBox(ctx, x, y, w, 86, color, 10, 6);
-  ctx.fillStyle = color === "#477BFF" ? "#FFFFFF" : INK;
+  ctx.fillStyle = color === "#3E5C76" ? "#FFFFFF" : INK;
   ctx.fillText(label, x + 34, y + 58);
   return { x, y, w: w + 10, h: 96 };
 }
@@ -876,7 +948,7 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
   ctx.lineJoin = "round";
   switch (d) {
     case "sticky": {
-      const cols = ["#FFD84D", "#9DDC8B", "#FF755E"];
+      const cols = ["#D9A441", "#8FA05A", "#D2693A"];
       cols.forEach((c, i) => {
         ctx.save();
         ctx.translate(i * 90 - 40, i * 70);
@@ -899,7 +971,7 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
         ctx.fillStyle = "#fff";
         ctx.fillRect(0, 0, 220, 260);
         sketchRect(ctx, r, 0, 0, 220, 260, 2);
-        ctx.fillStyle = i ? "#477BFF" : "#FFD84D";
+        ctx.fillStyle = i ? "#3E5C76" : "#D9A441";
         ctx.fillRect(16, 16, 188, 180);
         ctx.restore();
       });
@@ -921,7 +993,7 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
     }
     case "desk": {
       // mug
-      ctx.fillStyle = "#477BFF";
+      ctx.fillStyle = "#3E5C76";
       ctx.fillRect(40, 60, 150, 170);
       sketchRect(ctx, r, 40, 60, 150, 170, 2);
       ctx.beginPath();
@@ -937,7 +1009,7 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
       ctx.beginPath();
       ctx.arc(330, 200, 90, Math.PI, 0);
       ctx.stroke();
-      ctx.fillStyle = "#FF755E";
+      ctx.fillStyle = "#D2693A";
       ctx.fillRect(225, 180, 40, 80);
       ctx.fillRect(395, 180, 40, 80);
       break;
@@ -945,7 +1017,7 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
     case "terminal": {
       ctx.fillStyle = INK;
       ctx.fillRect(0, 0, 380, 260);
-      ctx.fillStyle = "#9DDC8B";
+      ctx.fillStyle = "#8FA05A";
       ctx.font = `500 30px ${f.mono}`;
       ctx.fillText("$ help", 26, 70);
       ctx.fillText("> projects", 26, 120);
@@ -998,7 +1070,7 @@ function drawDoodle(ctx: CanvasRenderingContext2D, f: Fonts, d: Doodle, r: () =>
       ctx.beginPath();
       ctx.arc(290, 150, 40, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#FFB3C7";
+      ctx.fillStyle = "#B5835A";
       ctx.fillRect(20, 20, 260, 260);
       ctx.strokeStyle = INK;
       ctx.lineWidth = 5;
@@ -1047,19 +1119,19 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.lineWidth = 3;
     [270, 380, 470].forEach((y) => sketchLine(ctx, r, 40, y, 700, y, 1));
     ctx.font = `700 72px ${f.hand}`;
-    ctx.fillStyle = "#477BFF";
+    ctx.fillStyle = "#3E5C76";
     ctx.fillText(site.name, 50, 255);
     ctx.font = `500 24px ${f.mono}`;
     ctx.fillStyle = INK;
     ctx.fillText("IF FOUND, PLEASE RETURN TO", 40, 320);
     ctx.font = `700 56px ${f.hand}`;
-    ctx.fillStyle = "#477BFF";
+    ctx.fillStyle = "#3E5C76";
     ctx.fillText("/contact  (it's an envelope)", 50, 368);
     ctx.font = `500 24px ${f.mono}`;
     ctx.fillStyle = INK;
     ctx.fillText("REWARD:", 40, 440);
     ctx.font = `700 56px ${f.hand}`;
-    ctx.fillStyle = "#477BFF";
+    ctx.fillStyle = "#3E5C76";
     ctx.fillText("one very good coffee", 200, 455);
     ctx.restore();
     tape(ctx, 480, 210, 220, 0.04);
@@ -1071,9 +1143,9 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     );
     ctx.strokeStyle = INK;
     ctx.lineWidth = 5;
-    star(ctx, 830, 1220, 40, "#FF755E");
-    washi(ctx, 170, 60, 260, -0.5, "#477BFF", "dots");
-    washi(ctx, 860, 1340, 260, -0.4, "#FFD84D", "check");
+    star(ctx, 830, 1220, 40, "#D2693A");
+    washi(ctx, 170, 60, 260, -0.5, "#3E5C76", "dots");
+    washi(ctx, 860, 1340, 260, -0.4, "#D9A441", "check");
     links.push({ x: 120, y: 520, w: 760, h: 120, href: "/contact" });
     return { texture: toTexture(c), links };
   }
@@ -1085,7 +1157,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.fillStyle = INK;
     ctx.font = `800 120px ${f.display}`;
     ctx.fillText("CONTENTS", 150, 200);
-    ctx.fillStyle = "#FF755E";
+    ctx.fillStyle = "#D2693A";
     ctx.fillRect(150, 222, 480, 12);
     const rows = [{ label: "Cover", page: "01", href: "/" }, ...navItems.map((n) => ({ label: n.label, page: n.page, href: n.href }))];
     rows.forEach((row, i) => {
@@ -1103,7 +1175,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
       ctx.fillText("p." + row.page, 820, y - 14);
       if (row.href !== "/") links.push({ x: 140, y: y - 80, w: 760, h: 88, href: row.href });
     });
-    ctx.fillStyle = "#477BFF";
+    ctx.fillStyle = "#3E5C76";
     ctx.font = `700 50px ${f.hand}`;
     ctx.save();
     ctx.translate(560, 1260);
@@ -1111,8 +1183,8 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.fillText("↖ tap a line to jump there", 0, 0);
     ctx.restore();
     cornerWashi(ctx, side, 1);
-    starSticker(ctx, 880, 1170, 34, "#FF755E");
-    starSticker(ctx, 930, 1090, 20, "#9DDC8B");
+    starSticker(ctx, 880, 1170, 34, "#D2693A");
+    starSticker(ctx, 930, 1090, 20, "#8FA05A");
     pageNumber(ctx, f, "i", side);
     return { texture: toTexture(c), links };
   }
@@ -1127,13 +1199,13 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.save();
     ctx.translate(170, 790);
     ctx.rotate(-0.03);
-    brutalBox(ctx, 0, 0, 660, 140, "#FFD84D", 12, 7);
+    brutalBox(ctx, 0, 0, 660, 140, "#D9A441", 12, 7);
     ctx.fillStyle = INK;
     ctx.font = `800 70px ${f.display}`;
     ctx.fillText("↑↑↓↓←→←→ B A", 36, 96);
     ctx.restore();
     ctx.font = `700 50px ${f.hand}`;
-    ctx.fillStyle = "#477BFF";
+    ctx.fillStyle = "#3E5C76";
     ctx.fillText("(or ask the terminal in the lab)", 170, 1080);
     ctx.strokeStyle = INK;
     ctx.lineWidth = 5;
@@ -1145,7 +1217,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     sketchLine(ctx, r, 520, 1220, 520, 1260, 2);
     sketchLine(ctx, r, 480, 1220, 480, 1250, 2);
     cornerWashi(ctx, side, 2);
-    postageStamp(ctx, f, 760, 1140, 0.12, "#FF755E", "?¢", "secret post");
+    postageStamp(ctx, f, 760, 1140, 0.12, "#D2693A", "?¢", "secret post");
     pageNumber(ctx, f, "xi", side);
     return { texture: toTexture(c), links };
   }
@@ -1161,11 +1233,11 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.save();
     ctx.translate(520, 1050);
     ctx.rotate(0.06);
-    const b = readButton(ctx, f, "SAY HI →", 0, 0, "#9DDC8B");
+    const b = readButton(ctx, f, "SAY HI →", 0, 0, "#8FA05A");
     ctx.restore();
     links.push({ x: 510, y: 1030, w: b.w + 20, h: b.h + 30, href: "/contact" });
     cornerWashi(ctx, side, 3);
-    miniPolaroid(ctx, f, r, 150, 740, -0.08, "#477BFF", "to be continued");
+    miniPolaroid(ctx, f, r, 150, 740, -0.08, "#3E5C76", "to be continued");
     pageNumber(ctx, f, "xii", side);
     return { texture: toTexture(c), links };
   }
@@ -1173,7 +1245,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
   // chapter
   ruled(ctx, 520, 62, 120);
   {
-    const accent = face.color === "#FFFFFF" ? "#FFD84D" : face.color;
+    const accent = face.color === "#FFFFFF" ? "#D9A441" : face.color;
     tornPaper(ctx, r, 118, 214, 760, 180, accent, 0.32);
   }
   // colour tab
@@ -1182,7 +1254,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
   ctx.strokeStyle = INK;
   ctx.lineWidth = 6;
   ctx.strokeRect(side === "right" ? PAGE_W - 150 : -10, 120, 160, 120);
-  ctx.fillStyle = face.color === "#477BFF" ? "#fff" : INK;
+  ctx.fillStyle = face.color === "#3E5C76" ? "#fff" : INK;
   ctx.font = `800 54px ${f.display}`;
   ctx.fillText(face.page, side === "right" ? PAGE_W - 120 : 34, 200);
 
@@ -1196,12 +1268,12 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
     ctx.font = `800 ${size}px ${f.display}`;
   }
   ctx.fillText(face.title.toUpperCase(), 142, 330);
-  ctx.fillStyle = face.color === "#FFFFFF" ? "#FFD84D" : face.color;
+  ctx.fillStyle = face.color === "#FFFFFF" ? "#D9A441" : face.color;
   ctx.globalAlpha = 0.85;
   ctx.fillRect(150, 350, Math.min(680, ctx.measureText(face.title.toUpperCase()).width), 22);
   ctx.globalAlpha = 1;
 
-  ctx.fillStyle = "#477BFF";
+  ctx.fillStyle = "#3E5C76";
   ctx.font = `700 60px ${f.hand}`;
   ctx.fillText(face.blurb, 150, 452);
 
@@ -1218,7 +1290,7 @@ export function paintFace(face: PageFace, f: Fonts, scale: number, side: "left" 
   ctx.save();
   ctx.translate(150, 1180);
   ctx.rotate(-0.02);
-  const b = readButton(ctx, f, "READ CHAPTER →", 0, 0, face.color === "#FFFFFF" ? "#FFD84D" : face.color);
+  const b = readButton(ctx, f, "READ CHAPTER →", 0, 0, face.color === "#FFFFFF" ? "#D9A441" : face.color);
   ctx.restore();
   links.push({ x: 140, y: 1160, w: b.w + 20, h: b.h + 30, href: face.href });
 
@@ -1255,22 +1327,41 @@ export function paintCloth(color: string, scale: number) {
 
 export function paintDoNotPress(f: Fonts) {
   const { c, ctx } = canvas(1, 256, 256);
-  ctx.fillStyle = "#FFFFFF";
+  const r = seeded(77);
+  // irregular wax blob
   ctx.beginPath();
-  ctx.arc(128, 128, 126, 0, Math.PI * 2);
+  for (let i = 0; i <= 28; i++) {
+    const a = (i / 28) * Math.PI * 2;
+    const rad = 118 + (r() - 0.5) * 14;
+    const x = 128 + Math.cos(a) * rad;
+    const y = 128 + Math.sin(a) * rad;
+    if (i) ctx.lineTo(x, y);
+    else ctx.moveTo(x, y);
+  }
+  const g = ctx.createRadialGradient(100, 96, 10, 128, 128, 130);
+  g.addColorStop(0, "#b3362a");
+  g.addColorStop(0.7, "#7d1d16");
+  g.addColorStop(1, "#4d0f0b");
+  ctx.fillStyle = g;
   ctx.fill();
-  ctx.fillStyle = "#e23b2e";
-  ctx.beginPath();
-  ctx.arc(128, 128, 110, 0, Math.PI * 2);
-  ctx.fill();
+  // pressed inner ring
   ctx.lineWidth = 6;
-  ctx.strokeStyle = INK;
+  ctx.strokeStyle = "rgba(40,5,3,0.6)";
+  ctx.beginPath();
+  ctx.arc(129, 130, 86, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.fillStyle = "#FFFFFF";
+  ctx.strokeStyle = "rgba(230,120,100,0.35)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(127, 127, 86, 0, Math.PI * 2);
+  ctx.stroke();
   ctx.textAlign = "center";
-  ctx.font = `800 44px ${f.display}`;
-  ctx.fillText("DO NOT", 128, 118);
-  ctx.fillText("PRESS", 128, 168);
+  ctx.font = `800 34px ${f.display}`;
+  for (const [dx, col] of [[2, "rgba(40,5,3,0.7)"], [0, "rgba(255,190,170,0.75)"]] as const) {
+    ctx.fillStyle = col;
+    ctx.fillText("DO NOT", 128 + dx, 122 + dx);
+    ctx.fillText("PRESS", 128 + dx, 160 + dx);
+  }
   return toTexture(c, 4);
 }
 
@@ -1279,7 +1370,7 @@ export function paintCuttingMat(f: Fonts, scale: number) {
   const H = 1200;
   const { c, ctx } = canvas(scale, W, H);
   const r = seeded(77);
-  ctx.fillStyle = "#3f8f5a";
+  ctx.fillStyle = "#2b3d33";
   ctx.fillRect(0, 0, W, H);
   // uneven dye + soft window light from the top-left
   for (let i = 0; i < 26; i++) {
@@ -1417,7 +1508,7 @@ export function paintPhoto(f: Fonts, bg: string, label: string, seed: number) {
   return toTexture(c, 4);
 }
 
-export function paintSticky(f: Fonts, text: string, color = "#FFD84D") {
+export function paintSticky(f: Fonts, text: string, color = "#D9A441") {
   const { c, ctx } = canvas(1, 256, 256);
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, 256, 256);
@@ -1469,7 +1560,7 @@ export function paintFlag(f: Fonts, page: string, title: string, color: string) 
   ctx.strokeStyle = INK;
   ctx.lineWidth = 10;
   ctx.strokeRect(W / 2 - 6, 5, W / 2, H - 10);
-  const ink = color === "#477BFF" ? "#FFFFFF" : INK;
+  const ink = color === "#3E5C76" ? "#FFFFFF" : INK;
   ctx.fillStyle = ink;
   ctx.font = `800 72px ${f.display}`;
   ctx.fillText(page, W / 2 + 22, 86);
@@ -1561,7 +1652,7 @@ export function paintDecal(f: Fonts, kind: "star" | "heart" | "smile" | "bolt" |
       ctx.beginPath();
       ctx.roundRect(14, 78, 228, 100, 50);
     });
-    ctx.fillStyle = color === "#477BFF" ? "#FFFFFF" : INK;
+    ctx.fillStyle = color === "#3E5C76" ? "#FFFFFF" : INK;
     ctx.font = `800 44px ${f.display}`;
     ctx.textAlign = "center";
     ctx.fillText(text, 128, 144);
@@ -1573,7 +1664,7 @@ export function paintDecal(f: Fonts, kind: "star" | "heart" | "smile" | "bolt" |
 export function paintNote(f: Fonts, text: string) {
   const { c, ctx } = canvas(1, 300, 300);
   paper(ctx, "#FFFFFF", 17, 300, 300);
-  ctx.strokeStyle = "rgba(71,123,255,0.35)";
+  ctx.strokeStyle = "rgba(62,92,118,0.35)";
   ctx.lineWidth = 2;
   for (let y = 60; y < 300; y += 34) {
     ctx.beginPath();
@@ -1605,13 +1696,16 @@ export function paintNameplate(f: Fonts) {
   const W = 740;
   const H = 300;
   const { c, ctx } = canvas(1, W, H);
-  ctx.fillStyle = "#FFD84D";
+  ctx.fillStyle = "#ece0c4";
   ctx.fillRect(0, 0, W, H);
-  grain(ctx, W, H, 2500, 31, "90,60,0");
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 14;
-  ctx.strokeRect(7, 7, W - 14, H - 14);
-  ctx.fillStyle = INK;
+  grain(ctx, W, H, 4000, 31, "90,60,20");
+  vignette(ctx, W, H, 0.3);
+  ctx.strokeStyle = "#3a2416";
+  ctx.lineWidth = 4;
+  ctx.strokeRect(14, 14, W - 28, H - 28);
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(24, 24, W - 48, H - 48);
+  ctx.fillStyle = "#3a2416";
   ctx.font = `500 26px ${f.mono}`;
   ctx.fillText("PROPERTY OF —", 36, 60);
   const fit = (s: string, max: number, size: number) => {
@@ -1632,12 +1726,18 @@ export function paintNameplate(f: Fonts) {
     fit(parts[0], 660, 140);
     ctx.fillText(parts[0], 34, 210);
   }
-  // label-maker number in the corner
-  ctx.fillStyle = INK;
-  ctx.fillRect(W - 150, 30, 110, 36);
-  ctx.fillStyle = "#FFFFFF";
+  // stamped number in the corner
+  ctx.save();
+  ctx.translate(W - 100, 54);
+  ctx.rotate(-0.08);
+  ctx.strokeStyle = "rgba(125,29,22,0.8)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(-60, -22, 120, 40);
+  ctx.fillStyle = "rgba(125,29,22,0.85)";
   ctx.font = `700 22px ${f.mono}`;
-  ctx.fillText("NO. 001", W - 140, 56);
+  ctx.textAlign = "center";
+  ctx.fillText("NO. 001", 0, 6);
+  ctx.restore();
   return toTexture(c, 8);
 }
 
@@ -1645,28 +1745,26 @@ export async function paintCoverPhoto(f: Fonts) {
   const W = 350;
   const H = 420;
   const { c, ctx } = canvas(1.4, W, H);
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = "#f1e8d6";
   ctx.fillRect(0, 0, W, H);
-  grain(ctx, W, H, 1500, 41, "60,50,30");
+  grain(ctx, W, H, 2500, 41, "90,60,30");
   const img = await loadImage(site.photo);
   if (img) drawCover(ctx, img, 22, 22, 306, 316);
   else {
-    ctx.fillStyle = "#9DDC8B";
+    ctx.fillStyle = "#8FA05A";
     ctx.fillRect(22, 22, 306, 316);
   }
   filmLook(ctx, 22, 22, 306, 316, 5);
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(40,25,15,0.5)";
+  ctx.lineWidth = 2;
   ctx.strokeRect(22, 22, 306, 316);
-  ctx.fillStyle = INK;
+  ctx.fillStyle = "#2a1d14";
   ctx.font = `700 44px ${f.hand}`;
   ctx.fillText("that's me ↑", 40, 392);
-  ctx.fillStyle = "rgba(71,123,255,0.85)";
+  ctx.fillStyle = "rgba(125,29,22,0.8)";
   ctx.font = `600 26px ${f.hand}`;
   ctx.fillText(site.photoDate, 236, 396);
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 8;
-  ctx.strokeRect(0, 0, W, H);
+  vignette(ctx, W, H, 0.25);
   return toTexture(c, 8);
 }
 
@@ -1674,19 +1772,22 @@ export function paintCoverNote(f: Fonts) {
   const W = 380;
   const H = 360;
   const { c, ctx } = canvas(1.2, W, H);
-  ctx.fillStyle = "#FFF4B8";
+  ctx.fillStyle = "#e9dcbc";
   ctx.fillRect(0, 0, W, H);
-  grain(ctx, W, H, 1500, 51, "120,90,0");
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0, 0, W, 40);
-  ctx.fillStyle = INK;
+  grain(ctx, W, H, 3000, 51, "110,70,20");
+  ctx.fillStyle = "rgba(125,29,22,0.55)";
+  ctx.fillRect(0, 50, W, 2);
+  ctx.fillStyle = "rgba(60,90,140,0.25)";
+  for (let y = 100; y < H - 10; y += 50) ctx.fillRect(0, y, W, 1.5);
+  vignette(ctx, W, H, 0.3);
+  ctx.fillStyle = "#2a1d14";
   ctx.font = `700 46px ${f.hand}`;
   const note = site.coverNote.replace(/\[PLACEHOLDER\]\s*/g, "");
   wrap(ctx, note, 330)
     .slice(0, 6)
     .forEach((l, i) => ctx.fillText(l, 24, 92 + i * 50));
   // folded-corner shading (the 3D flap sits on top of this)
-  ctx.fillStyle = "rgba(120,90,0,0.18)";
+  ctx.fillStyle = "rgba(90,60,20,0.2)";
   ctx.beginPath();
   ctx.moveTo(W, H - 70);
   ctx.lineTo(W, H);
@@ -1732,7 +1833,7 @@ export function paintTornSheet(color: string, seed: number, lines = false, graph
     }
   }
   if (lines) {
-    ctx.strokeStyle = "rgba(71,123,255,0.3)";
+    ctx.strokeStyle = "rgba(62,92,118,0.3)";
     ctx.lineWidth = 2;
     for (let y = 70; y < H; y += 34) {
       ctx.beginPath();

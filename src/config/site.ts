@@ -15,21 +15,20 @@ export const site = {
   name: "Ishaan Nene",
   firstName: "Ishaan",
   initials: "IN",
-  role: "[Your Role — e.g. Software Engineer]",
+  role: "Software Engineer",
   /** One-liner used on the diary cover & SEO description. */
-  tagline: "[PLACEHOLDER] Builds thoughtful software, one page at a time.",
+  tagline: "Builds the whole system behind the product — then writes it down.",
   /** Short handwritten intro on the cover (keep it under ~110 chars). */
-  coverNote: "[PLACEHOLDER] hi! I write code, break things on purpose & keep notes about all of it.",
+  coverNote: "hi! I write code, break things on purpose & keep notes about all of it.",
   /** Longer intro paragraphs for /about. */
   intro: [
-    "[PLACEHOLDER] Write two or three sentences about who you are, where you're based and what kind of engineering you enjoy most.",
-    "[PLACEHOLDER] Add a second paragraph about how you got into building software and what keeps you curious.",
-  ],
-  /** Replace with /images/your-photo.jpg (portrait, ~800×1000). Keep the basePath prefix. */
-  photo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/photo-placeholder.svg`,
-  photoAlt: "[PLACEHOLDER] Portrait photo",
+    "I'm Ishaan — a software engineer out of PES University, now at IBM. I like building the whole system behind a product, not just its front door: Rust microservices, Go platforms, Kafka pipelines and the dashboards that watch them.",
+    "My GitHub bio says I'm a true engineer because I vent IRL. Away from the keyboard it's chess (I keep building engines for it), guitar, and albums played front to back — Tool, MF DOOM, Kendrick.",
+  ],  /** Replace with /images/your-photo.jpg (portrait, ~800×1000). Keep the basePath prefix. */
+  photo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/ishaan.webp`,
+  photoAlt: "Ishaan Nene in a graduation cap and gown, arms crossed, in front of a brick wall",
   /** Handwritten date next to the cover photo. */
-  photoDate: "'26",
+  photoDate: "grad day",
   /**
    * Photos lying on the home-page desk, around and under the diary.
    * Put a jpg in public/images/desk/ and set src, e.g. `${base}/images/desk/workspace.jpg`.
@@ -40,7 +39,7 @@ export const site = {
     { src: "", caption: "first commit", date: "'26" },
     { src: "", caption: "me + guitar", date: "'26" },
   ] as { src: string; caption: string; date: string }[],
-  location: "[City, Country]",
+  location: "Bengaluru, India",
   /** IANA timezone used by the flip clock on /now. */
   timezone: "Asia/Kolkata",
   /** Public URL of the deployed site (used for SEO + sitemap). */
@@ -49,7 +48,7 @@ export const site = {
   status: {
     available: true,
     label: "[PLACEHOLDER] Open to new opportunities",
-    building: "[PLACEHOLDER] this neo-brutalist diary portfolio",
+    building: "Meridian — a Jira-style tracker in Rust",
   },
 
   contact: {
@@ -65,7 +64,7 @@ export const site = {
   },
 
   socials: {
-    github: "https://github.com/your-username",
+    github: "https://github.com/IshaanNene",
     linkedin: "https://www.linkedin.com/in/your-username",
   },
 
@@ -81,13 +80,7 @@ export const site = {
     laptop: "[PLACEHOLDER] Your setup — editor, OS, keyboard.",
   },
 
-  interests: [
-    "[PLACEHOLDER] Interest one",
-    "[PLACEHOLDER] Interest two",
-    "[PLACEHOLDER] Interest three",
-    "[PLACEHOLDER] Interest four",
-  ],
-
+  interests: ["Distributed systems", "Chess (and chess engines)", "Guitar", "Albums, front to back"],
   personality: [
     { label: "[Trait]", note: "[PLACEHOLDER] a short sentence that shows it" },
     { label: "[Trait]", note: "[PLACEHOLDER] a short sentence that shows it" },

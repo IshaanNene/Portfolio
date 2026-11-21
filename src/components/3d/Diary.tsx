@@ -9,7 +9,9 @@ import { DiaryCover, type CoverLayers } from "./DiaryCover";
 import { DiaryPage } from "./DiaryPages";
 import {
   loadFonts,
-  paintCloth,
+  paintLeather,
+  leatherMapUrl,
+  LEATHER_TILE,
   paintCover,
   paintCoverNote,
   paintCoverPhoto,
@@ -53,6 +55,7 @@ type Textures = {
   edgesV: THREE.Texture;
   cloth: THREE.Texture;
   clothDark: THREE.Texture;
+  leatherMaps: LeatherMaps;
   sticker: THREE.Texture;
   flags: THREE.Texture[];
   ticket: THREE.Texture;
@@ -60,6 +63,25 @@ type Textures = {
   note: THREE.Texture;
   layers: CoverLayers;
 };
+
+export type LeatherMaps = { normal: THREE.Texture | null; rough: THREE.Texture | null };
+
+/** Normal + roughness from the leather scan, tiled to line up with the painted colour. */
+async function loadLeatherMaps(): Promise<LeatherMaps> {
+  const loader = new THREE.TextureLoader();
+  const load = (m: "nor_gl" | "rough") =>
+    loader.loadAsync(leatherMapUrl(m)).then(
+      (t) => {
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.repeat.set(PAGE_W / LEATHER_TILE, PAGE_H / LEATHER_TILE);
+        t.anisotropy = 4;
+        return t;
+      },
+      () => null,
+    );
+  const [normal, rough] = await Promise.all([load("nor_gl"), load("rough")]);
+  return { normal, rough };
+}
 
 async function buildTextures(scale: number): Promise<Textures> {
   const f = readFonts();
@@ -79,12 +101,13 @@ async function buildTextures(scale: number): Promise<Textures> {
     blockTop,
     edgesH: paintPageEdges(1, true),
     edgesV: paintPageEdges(1, false),
-    cloth: paintCloth("#FF755E", 1),
-    clothDark: paintCloth("#171717", 1),
+    cloth: await paintLeather(1),
+    clothDark: await paintLeather(1, "#2e1a0e", 17),
+    leatherMaps: await loadLeatherMaps(),
     sticker: paintDoNotPress(f),
     flags: chapterTabs.map((t) => paintFlag(f, t.page, t.title, t.color === "#FFFFFF" ? "#F5EBD8" : t.color)),
-    ticket: paintTicket(f, "#FFD84D", "Hackathon", 6),
-    photo: paintPhoto(f, "#9DDC8B", "summer '2X", 13),
+    ticket: paintTicket(f, "#D9A441", "Hackathon", 6),
+    photo: paintPhoto(f, "#8FA05A", "summer '2X", 13),
     note: paintNote(f, "don't forget: drink water, push code"),
     layers,
   };
@@ -238,7 +261,7 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
     () => () => {
       if (!tex) return;
       [tex.cover, tex.inside, tex.blockTop, ...tex.pages.flatMap((p) => [p.front, p.back])].forEach((p) => p.texture.dispose());
-      [tex.edgesH, tex.edgesV, tex.cloth, tex.clothDark, tex.sticker, tex.ticket, tex.photo, tex.note, ...tex.flags, tex.layers.nameplate, tex.layers.photo, tex.layers.note].forEach((t) => t.dispose());
+      [tex.edgesH, tex.edgesV, tex.cloth, tex.clothDark, tex.leatherMaps.normal, tex.leatherMaps.rough, tex.sticker, tex.ticket, tex.photo, tex.note, ...tex.flags, tex.layers.nameplate, tex.layers.photo, tex.layers.note].forEach((t) => t?.dispose());
     },
     [tex],
   );
@@ -280,14 +303,14 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
       {/* back board */}
       <mesh position={[COVER_W / 2, 0, -BOOK.T / 2 - BOOK.coverT / 2]} castShadow={shadows} receiveShadow={shadows}>
         <boxGeometry args={[COVER_W, COVER_H, BOOK.coverT]} />
-        <meshStandardMaterial map={tex.cloth} roughness={0.85} />
-        <Edges color="#171717" threshold={20} />
+        <meshStandardMaterial map={tex.cloth} normalMap={tex.leatherMaps.normal} roughnessMap={tex.leatherMaps.rough} roughness={0.9} />
+        <Edges color="#1c0f07" threshold={20} />
       </mesh>
 
       {/* spine */}
       <mesh position={[-BOOK.coverT / 2, 0, 0]} castShadow={shadows} receiveShadow={shadows}>
         <boxGeometry args={[BOOK.coverT, COVER_H, BOOK.T + BOOK.coverT * 2]} />
-        <meshStandardMaterial map={tex.clothDark} roughness={0.8} />
+        <meshStandardMaterial map={tex.clothDark} normalMap={tex.leatherMaps.normal} roughnessMap={tex.leatherMaps.rough} roughness={0.9} />
       </mesh>
 
       {/* page block */}
@@ -317,13 +340,13 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
       {[-0.36, -0.12, 0.12, 0.36].map((f) => (
         <mesh key={f} position={[-BOOK.coverT / 2 - 0.004, f * COVER_H, 0]} castShadow={shadows}>
           <boxGeometry args={[BOOK.coverT + 0.012, 0.028, BOOK.T + BOOK.coverT * 2 + 0.006]} />
-          <meshStandardMaterial color="#262321" roughness={0.7} />
+          <meshStandardMaterial map={tex.clothDark} color="#8a6a52" roughness={0.65} />
         </mesh>
       ))}
       {[1, -1].map((sgn) => (
         <mesh key={sgn} position={[0.012, sgn * (PAGE_HEIGHT / 2 + 0.004), -BOOK.T / 2 + blockDepth / 2]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.014, 0.014, blockDepth, 10]} />
-          <meshStandardMaterial color={sgn > 0 ? "#FFD84D" : "#477BFF"} roughness={0.6} />
+          <meshStandardMaterial color={sgn > 0 ? "#b8863f" : "#6e2d1f"} roughness={0.6} />
         </mesh>
       ))}
 
@@ -365,6 +388,7 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
         cover={tex.cover.texture}
         inside={tex.inside.texture}
         cloth={tex.cloth}
+        leatherMaps={tex.leatherMaps}
         sticker={tex.sticker}
         layers={tex.layers}
         shadows={shadows}
@@ -380,26 +404,26 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
         }}
       />
 
-      {/* elastic band — slides off when the diary opens */}
+      {/* leather wrap strap — slides off when the diary opens */}
       <group ref={band} position={[COVER_W * 0.93, 0, 0]}>
         {[1, -1].map((s) => (
           <mesh key={"f" + s} position={[0, 0, s * (bandZ / 2 - 0.003)]}>
-            <boxGeometry args={[0.07, bandH, 0.006]} />
-            <meshStandardMaterial color="#171717" roughness={0.6} />
+            <boxGeometry args={[0.085, bandH, 0.01]} />
+            <meshStandardMaterial map={tex.cloth} color="#c58a52" roughness={0.7} />
           </mesh>
         ))}
         {[1, -1].map((s) => (
           <mesh key={s} position={[0, (s * bandH) / 2, 0]}>
-            <boxGeometry args={[0.07, 0.008, bandZ]} />
-            <meshStandardMaterial color="#171717" roughness={0.6} />
+            <boxGeometry args={[0.085, 0.012, bandZ]} />
+            <meshStandardMaterial map={tex.cloth} color="#c58a52" roughness={0.7} />
           </mesh>
         ))}
       </group>
 
       {/* three satin ribbon bookmarks fanning out of the bottom */}
-      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.42} len={0.34} yaw={-0.32} color="#477BFF" drop={BOOK.T / 2 + BOOK.coverT - 0.03} />
-      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.55} len={0.46} yaw={0.04} color="#FF755E" drop={BOOK.T / 2 + BOOK.coverT - 0.028} />
-      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.68} len={0.3} yaw={0.36} color="#FFD84D" drop={BOOK.T / 2 + BOOK.coverT - 0.026} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.42} len={0.34} yaw={-0.32} color="#2f4a3a" drop={BOOK.T / 2 + BOOK.coverT - 0.03} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.55} len={0.46} yaw={0.04} color="#7a2e24" drop={BOOK.T / 2 + BOOK.coverT - 0.028} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.68} len={0.3} yaw={0.36} color="#c9a25a" drop={BOOK.T / 2 + BOOK.coverT - 0.026} />
 
       {/* chapter index flags stuck along the fore-edge */}
       {chapterTabs.map((t, i) => {

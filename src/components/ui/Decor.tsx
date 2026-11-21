@@ -7,7 +7,7 @@ export function Tape({ className, style, color }: { className?: string; style?: 
 }
 
 /** Pushpin for pinboards. */
-export function Pin({ color = "#FF755E", className }: { color?: string; className?: string }) {
+export function Pin({ color = "#D2693A", className }: { color?: string; className?: string }) {
   return (
     <span aria-hidden className={cn("absolute left-1/2 top-1 z-10 -translate-x-1/2", className)}>
       <span className="block h-4 w-4 rounded-full border-2 border-ink" style={{ background: color, boxShadow: "2px 3px 0 rgba(0,0,0,.35)" }} />
@@ -35,7 +35,7 @@ export function PaperClip({ className }: { className?: string }) {
 /** Rubber stamp text block. */
 export function RubberStamp({
   children,
-  color = "#FF755E",
+  color = "#D2693A",
   className,
   rotate = -8,
 }: {

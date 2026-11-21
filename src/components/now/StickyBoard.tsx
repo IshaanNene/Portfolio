@@ -24,7 +24,7 @@ export function StickyBoard() {
       >
         {/* status key pinned along the top of the board */}
         <div className="relative mb-8 flex flex-wrap items-center gap-3 pl-2 pt-2">
-          <PushPin className="absolute -left-1 -top-2" color="#477BFF" />
+          <PushPin className="absolute -left-1 -top-2" color="#3E5C76" />
           <ScrapbookLabel kind="date" rotate={-3}>
             this week
           </ScrapbookLabel>

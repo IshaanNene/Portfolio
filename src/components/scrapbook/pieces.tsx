@@ -83,7 +83,7 @@ export function PaperStack({ children, className, colors = ["#efe3c8", "#f7eedb"
 
 export const stickyColors = {
   yellow: "#FFE873",
-  pink: "#FFB3C7",
+  pink: "#B5835A",
   blue: "#A9C9FF",
   green: "#B8E89F",
 } as const;
@@ -122,7 +122,7 @@ export function Staple({ className, rotate = 0 }: { className?: string; rotate?:
   );
 }
 
-export function PushPin({ color = "#FF755E", className }: { color?: string; className?: string }) {
+export function PushPin({ color = "#D2693A", className }: { color?: string; className?: string }) {
   return (
     <svg viewBox="0 0 30 34" className={cn("pointer-events-none h-8 w-7", className)} aria-hidden>
       <ellipse cx="17" cy="31" rx="7" ry="2.4" fill="rgba(0,0,0,.25)" />
@@ -178,7 +178,7 @@ export function ScrapbookLabel({
   return (
     <div className={cn("relative w-56 border-2 border-ink/70 bg-paper p-3 pt-2 shadow-[3px_4px_0_rgba(0,0,0,.18)]", className)} style={style}>
       <div className="border-b-2 border-coral pb-1 font-mono text-[10px] font-bold uppercase tracking-[0.25em]">{n ?? "index card"}</div>
-      <div className="bg-[repeating-linear-gradient(180deg,transparent_0_23px,rgba(71,123,255,.3)_23px_24px)] pt-1 font-hand text-xl font-bold leading-[24px]">{children}</div>
+      <div className="bg-[repeating-linear-gradient(180deg,transparent_0_23px,rgba(62,92,118,.3)_23px_24px)] pt-1 font-hand text-xl font-bold leading-[24px]">{children}</div>
     </div>
   );
 }
@@ -186,7 +186,7 @@ export function ScrapbookLabel({
 /* ───────── handwritten annotations ───────── */
 
 /** Hand-drawn ellipse around inline text. */
-export function Circled({ children, color = "#FF755E", className }: { children: ReactNode; color?: string; className?: string }) {
+export function Circled({ children, color = "#D2693A", className }: { children: ReactNode; color?: string; className?: string }) {
   return (
     <span className={cn("relative inline-block px-1", className)}>
       {children}
@@ -198,7 +198,7 @@ export function Circled({ children, color = "#FF755E", className }: { children: 
 }
 
 /** Scribbled underline. */
-export function Underlined({ children, color = "#477BFF", className }: { children: ReactNode; color?: string; className?: string }) {
+export function Underlined({ children, color = "#3E5C76", className }: { children: ReactNode; color?: string; className?: string }) {
   return (
     <span className={cn("relative inline-block", className)}>
       {children}
@@ -216,7 +216,7 @@ export function Corrected({ wrong, right, className }: { wrong: ReactNode; right
       <span className="relative text-ink/55">
         {wrong}
         <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="draw pointer-events-none absolute inset-x-0 top-1/2 h-4 w-full -translate-y-1/2 overflow-visible" aria-hidden>
-          <path pathLength={1} d="M0 12 L100 6 M2 7 L98 13" stroke="#FF755E" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <path pathLength={1} d="M0 12 L100 6 M2 7 L98 13" stroke="#D2693A" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
         </svg>
       </span>
       <span className="absolute -top-6 left-1/2 -translate-x-1/2 -rotate-3 whitespace-nowrap font-hand text-xl font-bold leading-none text-coral">{right}</span>

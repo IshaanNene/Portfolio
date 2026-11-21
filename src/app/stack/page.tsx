@@ -8,7 +8,7 @@ import { LabelTape } from "@/components/ui/Scrapbook";
 import { levelLabel } from "@/data/skills";
 import { PaperStack, Staple } from "@/components/scrapbook/pieces";
 
-const levelColor = { daily: "#9DDC8B", comfortable: "#FFD84D", learning: "#a9c3ff" } as const;
+const levelColor = { daily: "#8FA05A", comfortable: "#D9A441", learning: "#a9c3ff" } as const;
 
 export const metadata: Metadata = {
   title: "Stack",
@@ -27,7 +27,7 @@ export default function StackPage() {
       </div>
       <div className="-mt-4 mb-20 flex flex-wrap items-center gap-x-4 gap-y-6">
         {/* the key, on a little stack of index cards */}
-        <PaperStack seed={11} className="order-last w-64 -rotate-2 md:order-none" colors={["#a9c3ff", "#FFD84D"]}>
+        <PaperStack seed={11} className="order-last w-64 -rotate-2 md:order-none" colors={["#a9c3ff", "#D9A441"]}>
           <div className="relative border-[3px] border-ink bg-paper p-3 pt-2">
             <Staple className="absolute -top-1 left-6" rotate={-5} />
             <p className="border-b-2 border-coral pb-1 font-mono text-[10px] font-bold uppercase tracking-[0.25em]">key · how well I know it</p>

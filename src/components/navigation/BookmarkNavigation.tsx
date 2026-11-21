@@ -72,18 +72,19 @@ export function BookmarkNavigation() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
+                  aria-label={`${item.label} (page ${item.page})`}
                   onMouseEnter={() => play("tick")}
                   className={cn(
                     "group pointer-events-auto relative flex h-10 items-center gap-2 border-[3px] border-r-0 border-ink pl-5 pr-2 font-display text-[13px] font-extrabold uppercase tracking-tight transition-[width,box-shadow] duration-300 ease-[var(--ease-paper)] [@media(max-height:640px)]:h-8",
                     colorClass[item.color],
-                    active ? "w-44 shadow-[-5px_5px_0_#171717]" : "w-36 shadow-[-2px_3px_0_#171717] hover:w-40 focus-visible:w-40",
+                    active ? "w-16 shadow-[-5px_5px_0_#171717] hover:w-44 focus-visible:w-44 min-[1440px]:w-44" : "w-12 shadow-[-2px_3px_0_#171717] hover:w-40 focus-visible:w-40 min-[1440px]:w-36",
                   )}
                   style={{ clipPath: "polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%)" }}
                 >
                   <span className="font-mono text-[10px] opacity-70">{item.page}</span>
-                  <span className="whitespace-nowrap">{item.label}</span>
+                  <span className="hidden whitespace-nowrap group-hover:inline group-focus-visible:inline min-[1440px]:inline">{item.label}</span>
                   {active && (
-                    <span className="ml-auto grid h-5 w-5 place-items-center rounded-full border-2 border-ink bg-paper" aria-hidden>
+                    <span className="ml-auto hidden h-5 w-5 place-items-center group-hover:grid group-focus-visible:grid min-[1440px]:grid rounded-full border-2 border-ink bg-paper" aria-hidden>
                       <span className="h-1.5 w-1.5 rounded-full bg-ink" />
                     </span>
                   )}

@@ -36,8 +36,8 @@ export function HomeSpread() {
         {/* intro on a torn, ruled sheet */}
         <TornPaper seed={4} ruled rotate={-1.2} className="pb-2" edges={["top", "right", "bottom"]}>
           <div className="relative px-6 pb-10 pl-16 pt-10 sm:pr-10">
-            <Washi pattern="stripe" color="#FF755E" className="-top-1 left-10 -rotate-6" />
-            <Washi pattern="dots" color="#477BFF" className="-top-1 right-8 rotate-[8deg]" />
+            <Washi pattern="stripe" color="#D2693A" className="-top-1 left-10 -rotate-6" />
+            <Washi pattern="dots" color="#3E5C76" className="-top-1 right-8 rotate-[8deg]" />
             <div className="flex flex-wrap items-center gap-2">
               <ScrapbookLabel kind="date" rotate={-2}>
                 {today} — cover notes
@@ -59,9 +59,9 @@ export function HomeSpread() {
               <Hand as="p" className="max-w-sm text-2xl text-electric">
                 every coloured tab sticking out of the diary is a different chapter — go on, flip through.
               </Hand>
-              <HandArrow className="mb-6 hidden shrink-0 -rotate-12 sm:block" color="#477BFF" />
+              <HandArrow className="mb-6 hidden shrink-0 -rotate-12 sm:block" color="#3E5C76" />
             </div>
-            <Doodle kind="star" className="absolute bottom-4 right-6 h-12 w-12" color="#FF755E" />
+            <Doodle kind="star" className="absolute bottom-4 right-6 h-12 w-12" color="#D2693A" />
           </div>
         </TornPaper>
 
@@ -117,18 +117,18 @@ export function HomeSpread() {
         >
           {/* a hidden photo lies underneath the top one */}
           <Draggable bounds={desk} rotate={-9} className="hidden md:absolute md:left-[6%] md:top-14 md:block">
-            <PhotoCard alt="a hidden photo" caption="you found me!" tint="#FFD84D" back="most people never move the top photo. you did. ★" />
+            <PhotoCard alt="a hidden photo" caption="you found me!" tint="#D9A441" back="most people never move the top photo. you did. ★" />
           </Draggable>
           <Draggable bounds={desk} rotate={5} className="md:absolute md:left-[5%] md:top-10">
             <div className="relative">
               <PhotoCard src={site.photo} alt={site.photoAlt} caption="me, probably" back="this is the photo I'd put on a fridge." size="md" />
-              <Washi pattern="grid" color="#9DDC8B" className="-top-3 left-1/2 -translate-x-1/2 rotate-3 !w-20" />
+              <Washi pattern="grid" color="#8FA05A" className="-top-3 left-1/2 -translate-x-1/2 rotate-3 !w-20" />
             </div>
           </Draggable>
           <Draggable bounds={desk} rotate={-4} className="md:absolute md:left-[30%] md:top-24">
             <div className="relative">
-              <PhotoCard alt="desk at night" caption="late-night desk" tint="#477BFF" back="the best ideas show up after 11pm." size="sm" />
-              <PushPin className="absolute -top-3 left-1/2 -translate-x-1/2" color="#FFD84D" />
+              <PhotoCard alt="desk at night" caption="late-night desk" tint="#3E5C76" back="the best ideas show up after 11pm." size="sm" />
+              <PushPin className="absolute -top-3 left-1/2 -translate-x-1/2" color="#D9A441" />
             </div>
           </Draggable>
 
@@ -143,7 +143,7 @@ export function HomeSpread() {
           </DragSticky>
 
           <div className="relative md:absolute md:bottom-16 md:right-[12%]">
-            <SecretStamp label="Top secret" mark="opened" color="#477BFF" secret={<>the diary has a back page that was never bound in. ↑↑↓↓←→←→ B A</>} />
+            <SecretStamp label="Top secret" mark="opened" color="#3E5C76" secret={<>the diary has a back page that was never bound in. ↑↑↓↓←→←→ B A</>} />
           </div>
 
           <Draggable bounds={desk} rotate={8} className="md:absolute md:bottom-8 md:left-[8%]">
@@ -162,13 +162,10 @@ export function HomeSpread() {
             <Sticker label="star sticker" egg="sticker2">
               <StarSticker className="h-14 w-14" />
             </Sticker>
-            <Sticker label="smiley sticker">
+            <Sticker label="lightning bolt sticker">
               <svg viewBox="0 0 100 100" className="h-14 w-14" aria-hidden>
-                <circle cx="50" cy="50" r="42" fill="#477BFF" stroke="#fff" strokeWidth="12" paintOrder="stroke" />
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#171717" strokeWidth="4" />
-                <circle cx="36" cy="42" r="5" fill="#171717" />
-                <circle cx="64" cy="42" r="5" fill="#171717" />
-                <path d="M30 58 Q50 78 70 58" fill="none" stroke="#171717" strokeWidth="5" strokeLinecap="round" />
+                <path d="M58 6 L22 56 H46 L38 94 L78 40 H54 Z" fill="#D9A441" stroke="#fff" strokeWidth="12" strokeLinejoin="round" paintOrder="stroke" />
+                <path d="M58 6 L22 56 H46 L38 94 L78 40 H54 Z" fill="none" stroke="#171717" strokeWidth="4" strokeLinejoin="round" />
               </svg>
             </Sticker>
             <Sticker label="code sticker">
@@ -178,7 +175,7 @@ export function HomeSpread() {
 
           <LooseClip bounds={desk} className="hidden md:block md:right-[33%] md:top-60" />
           <Doodle kind="rocket" className="hidden h-16 w-16 md:absolute md:bottom-6 md:right-[3%] md:block" />
-          <Doodle kind="spiral" className="hidden md:absolute md:left-[44%] md:top-4 md:block" color="#FF755E" />
+          <Doodle kind="spiral" className="hidden md:absolute md:left-[44%] md:top-4 md:block" color="#D2693A" />
         </div>
         <p className="mt-3 text-right font-hand text-lg text-ink-soft">(it all goes back where it was when you leave. desks are like that.)</p>
       </div>
@@ -210,7 +207,7 @@ function ChapterTile({ i, href, page, label, blurb, color }: { i: number; href: 
         <TornPaper seed={i + 20} className="aspect-square" color="#FBF5E8" grid>
           <span className="flex h-full flex-col justify-between p-4">{inner}</span>
         </TornPaper>
-        <Washi pattern="check" color="#FFD84D" className="-top-2 left-1/2 -translate-x-1/2 -rotate-3 !w-20" />
+        <Washi pattern="check" color="#D9A441" className="-top-2 left-1/2 -translate-x-1/2 -rotate-3 !w-20" />
       </Link>
     );
   if (kind === 2)
@@ -222,7 +219,7 @@ function ChapterTile({ i, href, page, label, blurb, color }: { i: number; href: 
     );
   return (
     <Link href={href} className="relative block aspect-square border-2 border-ink bg-paper p-3 shadow-[4px_5px_0_rgba(0,0,0,.2)]">
-      <span className="flex h-full flex-col justify-between border-t-[3px] border-coral bg-[repeating-linear-gradient(180deg,transparent_0_23px,rgba(71,123,255,.28)_23px_24px)] pt-2">
+      <span className="flex h-full flex-col justify-between border-t-[3px] border-coral bg-[repeating-linear-gradient(180deg,transparent_0_23px,rgba(62,92,118,.28)_23px_24px)] pt-2">
         {inner}
       </span>
     </Link>

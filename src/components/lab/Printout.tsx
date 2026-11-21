@@ -13,8 +13,8 @@ const NOTES = [
 export function Printout() {
   return (
     <div className="relative mx-auto max-w-md rotate-[-1.2deg]">
-      <Washi pattern="stripe" color="#477BFF" className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
-      <div className="relative border-x-[3px] border-ink bg-[#f4f7ef] shadow-brutal-lg" style={{ backgroundImage: "repeating-linear-gradient(180deg, transparent 0 28px, rgba(157,220,139,.35) 28px 56px)" }}>
+      <Washi pattern="stripe" color="#3E5C76" className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
+      <div className="relative border-x-[3px] border-ink bg-[#f4f7ef] shadow-brutal-lg" style={{ backgroundImage: "repeating-linear-gradient(180deg, transparent 0 28px, rgba(143,160,90,.35) 28px 56px)" }}>
         {/* sprocket holes */}
         {["left-1.5", "right-1.5"].map((side) => (
           <div key={side} className={`absolute inset-y-0 ${side} flex flex-col justify-around py-2`} aria-hidden>
@@ -65,7 +65,7 @@ export function TerminalSketch() {
             <text x="305" y="57">commands</text>
             <text x="180" y="157">print lines</text>
           </g>
-          <text x="60" y="120" style={{ fontFamily: "var(--font-hand)" }} fontSize="16" fill="#FF755E" transform="rotate(-8 60 120)">
+          <text x="60" y="120" style={{ fontFamily: "var(--font-hand)" }} fontSize="16" fill="#D2693A" transform="rotate(-8 60 120)">
             repeat ↺
           </text>
         </svg>

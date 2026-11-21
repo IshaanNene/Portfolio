@@ -26,5 +26,5 @@ export const colorClass: Record<NavItem["color"], string> = {
   grass: "bg-grass",
   paper: "bg-paper",
   cream: "bg-cream",
-  pink: "bg-[#FFB3C7]",
+  pink: "bg-[#B5835A]",
 };

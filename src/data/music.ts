@@ -18,11 +18,11 @@ export type Album = {
 };
 
 export const albums: Album[] = [
-  { title: "Lateralus", artist: "Tool", year: "2001", cover: "", color: "#477BFF", note: "[PLACEHOLDER] why this one stuck with you" },
-  { title: "Madvillainy", artist: "Madvillain", year: "2004", cover: "", color: "#FF755E", note: "[PLACEHOLDER] favourite track + why" },
-  { title: "To Pimp a Butterfly", artist: "Kendrick Lamar", year: "2015", cover: "", color: "#9DDC8B", note: "[PLACEHOLDER] what it means to you" },
-  { title: "[Album]", artist: "[Artist]", year: "[YYYY]", cover: "", color: "#FFD84D", note: "[PLACEHOLDER] another favourite" },
-  { title: "[Album]", artist: "[Artist]", year: "[YYYY]", cover: "", color: "#FFB3C7", note: "[PLACEHOLDER] one more for the crate" },
+  { title: "Lateralus", artist: "Tool", year: "2001", cover: "", color: "#3E5C76", note: "[PLACEHOLDER] why this one stuck with you" },
+  { title: "Madvillainy", artist: "Madvillain", year: "2004", cover: "", color: "#D2693A", note: "[PLACEHOLDER] favourite track + why" },
+  { title: "To Pimp a Butterfly", artist: "Kendrick Lamar", year: "2015", cover: "", color: "#8FA05A", note: "[PLACEHOLDER] what it means to you" },
+  { title: "[Album]", artist: "[Artist]", year: "[YYYY]", cover: "", color: "#D9A441", note: "[PLACEHOLDER] another favourite" },
+  { title: "[Album]", artist: "[Artist]", year: "[YYYY]", cover: "", color: "#B5835A", note: "[PLACEHOLDER] one more for the crate" },
 ];
 
 /** What's on the turntable. */

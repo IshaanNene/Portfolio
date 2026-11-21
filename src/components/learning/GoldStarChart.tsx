@@ -7,9 +7,9 @@ import { StarSticker } from "@/components/ui/Scrapbook";
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 const ROWS = [
-  { label: "read something", color: "#FFD84D" },
-  { label: "built something", color: "#FF755E" },
-  { label: "learnt something", color: "#9DDC8B" },
+  { label: "read something", color: "#D9A441" },
+  { label: "built something", color: "#D2693A" },
+  { label: "learnt something", color: "#8FA05A" },
 ];
 
 /** A primary-school sticker chart. Stars are kept in this browser. */

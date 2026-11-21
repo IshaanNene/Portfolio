@@ -19,7 +19,7 @@ const PATTERNS: Record<WashiPattern, (c: string) => string> = {
 /** Patterned washi tape strip. Position it with className. */
 export function Washi({
   pattern = "stripe",
-  color = "#FF755E",
+  color = "#D2693A",
   className,
   style,
 }: {
@@ -84,7 +84,7 @@ export function PostageStamp({
 }
 
 /** Vinyl star sticker with a white die-cut border. */
-export function StarSticker({ color = "#FFD84D", className }: { color?: string; className?: string }) {
+export function StarSticker({ color = "#D9A441", className }: { color?: string; className?: string }) {
   return (
     <svg viewBox="0 0 100 100" className={cn("sticker h-10 w-10", className)} aria-hidden>
       <path
@@ -120,7 +120,7 @@ export function CautionTape({ text, className, rotate = -1.2 }: { text: string; 
     <div aria-hidden className={cn("relative -mx-4 overflow-hidden sm:-mx-8", className)} style={{ transform: `rotate(${rotate}deg)` }}>
       <div
         className="flex h-11 items-center whitespace-nowrap border-y-[3px] border-ink font-display text-sm font-extrabold uppercase tracking-[0.2em] shadow-brutal"
-        style={{ background: "repeating-linear-gradient(-45deg, #FFD84D 0 22px, #171717 22px 44px)" }}
+        style={{ background: "repeating-linear-gradient(-45deg, #D9A441 0 22px, #171717 22px 44px)" }}
       >
         <span className="mx-auto bg-sun px-3 py-0.5">{run}</span>
       </div>
@@ -174,7 +174,7 @@ export function HazardLabel({ title, children, className }: { title: string; chi
     <div aria-hidden className={cn("flex w-72 items-stretch border-[3px] border-ink bg-paper shadow-brutal", className)}>
       <div className="grid w-20 shrink-0 place-items-center border-r-[3px] border-ink bg-sun">
         <svg viewBox="0 0 60 54" className="h-12 w-12" aria-hidden>
-          <path d="M30 3 57 51H3Z" fill="#FFD84D" stroke="#171717" strokeWidth="4" strokeLinejoin="round" />
+          <path d="M30 3 57 51H3Z" fill="#D9A441" stroke="#171717" strokeWidth="4" strokeLinejoin="round" />
           <circle cx="30" cy="40" r="3.2" fill="#171717" />
           <path d="M30 18v15" stroke="#171717" strokeWidth="5" strokeLinecap="round" />
         </svg>
@@ -207,7 +207,7 @@ export function Postcard({ to, message, className }: { to: string; message: stri
       <div className="relative p-5 sm:border-r-2 sm:border-dashed sm:border-ink/40">
         <p className="font-serif text-3xl font-black italic leading-none">Wish you were here!</p>
         <p className="mt-4 font-hand text-2xl font-bold leading-snug text-electric">{message}</p>
-        <StarSticker color="#FF755E" className="absolute -bottom-4 left-4 h-10 w-10 -rotate-12" />
+        <StarSticker color="#D2693A" className="absolute -bottom-4 left-4 h-10 w-10 -rotate-12" />
       </div>
       <div className="relative p-5 pt-6">
         <PostageStamp value="30¢" label="first class" color="bg-electric" rotate={4} postmark={false} className="float-right -mt-2 ml-3 origin-top-right scale-75" />
@@ -220,7 +220,7 @@ export function Postcard({ to, message, className }: { to: string; message: stri
           ))}
         </div>
       </div>
-      <Washi pattern="dots" color="#9DDC8B" className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
+      <Washi pattern="dots" color="#8FA05A" className="-top-3 left-1/2 -translate-x-1/2 rotate-2" />
     </div>
   );
 }

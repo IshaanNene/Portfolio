@@ -46,7 +46,7 @@ export const drawers: Drawer[] = [
     id: "backend",
     label: "Backend",
     code: "A-01",
-    color: "#FFD84D",
+    color: "#D9A441",
     description: "[SAMPLE] Services, APIs and the plumbing nobody sees.",
     skills: [
       s("Node.js", siNodedotjs, "daily", "[SAMPLE] What you build with it."),
@@ -60,7 +60,7 @@ export const drawers: Drawer[] = [
     id: "frontend",
     label: "Frontend",
     code: "A-02",
-    color: "#FF755E",
+    color: "#D2693A",
     description: "[SAMPLE] Interfaces, interactions and pixels that behave.",
     skills: [
       s("React", siReact, "daily", "[SAMPLE] What you build with it."),
@@ -74,7 +74,7 @@ export const drawers: Drawer[] = [
     id: "cloud",
     label: "Cloud & Infra",
     code: "B-01",
-    color: "#477BFF",
+    color: "#3E5C76",
     description: "[SAMPLE] Where the code lives once it leaves my laptop.",
     skills: [
       s("Docker", siDocker, "daily", "[SAMPLE] How you use it."),
@@ -91,7 +91,7 @@ export const drawers: Drawer[] = [
     id: "databases",
     label: "Databases",
     code: "B-02",
-    color: "#9DDC8B",
+    color: "#8FA05A",
     description: "[SAMPLE] Places where data sleeps (and sometimes wakes up angry).",
     skills: [
       s("PostgreSQL", siPostgresql, "daily", "[SAMPLE] How you use it."),
@@ -137,7 +137,7 @@ export const drawers: Drawer[] = [
     id: "languages",
     label: "Languages",
     code: "D-01",
-    color: "#FFD84D",
+    color: "#D9A441",
     description: "[SAMPLE] The words I think in.",
     skills: [
       s("TypeScript", siTypescript, "daily", "[SAMPLE] Where you reach for it."),

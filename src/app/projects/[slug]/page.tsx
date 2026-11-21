@@ -62,7 +62,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 <p className="mt-4 max-w-2xl text-lg leading-relaxed">{p.summary}</p>
               </div>
               <div className="flex flex-col items-end gap-3">
-                <RubberStamp color={p.status === "shipped" ? "#2f8a3a" : "#FF755E"}>{statusLabel[p.status]}</RubberStamp>
+                <RubberStamp color={p.status === "shipped" ? "#2f8a3a" : "#D2693A"}>{statusLabel[p.status]}</RubberStamp>
                 {p.sample && <SampleStamp label="sample case" />}
               </div>
             </div>
@@ -120,7 +120,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                       <li
                         key={i}
                         className="relative p-4 shadow-[5px_6px_0_rgba(0,0,0,.2)]"
-                        style={{ background: ["#FFD84D", "#9DDC8B", "#a9c3ff"][i % 3], transform: `rotate(${tilt(i + 9, 2)}deg)` }}
+                        style={{ background: ["#D9A441", "#8FA05A", "#a9c3ff"][i % 3], transform: `rotate(${tilt(i + 9, 2)}deg)` }}
                       >
                         <p className="font-display text-lg font-extrabold uppercase leading-tight">{d.title}</p>
                         <p className="mt-1 font-hand text-xl font-semibold leading-tight">{clean(d.why)}</p>

@@ -57,7 +57,7 @@ export default function ExperiencePage() {
           <SecretStamp
             label="Audited"
             mark="checked"
-            color="#FF755E"
+            color="#D2693A"
             secret={<>no padded numbers on this receipt. every line is real, or marked as a placeholder.</>}
           />
         </div>

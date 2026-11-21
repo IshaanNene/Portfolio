@@ -69,6 +69,7 @@ export function CameraRig({
   direction = [0, 0.82, 0.57],
   reduced,
   parallax = true,
+  reserveRight = 0,
 }: {
   target: [number, number, number];
   width: number;
@@ -76,6 +77,8 @@ export function CameraRig({
   direction?: [number, number, number];
   reduced: boolean;
   parallax?: boolean;
+  /** Screen pixels on the right kept clear (e.g. for the bookmark tabs). */
+  reserveRight?: number | ((viewportWidth: number) => number);
 }) {
   const { camera, size, pointer } = useThree();
   const look = useRef(new THREE.Vector3(...target));
@@ -83,14 +86,17 @@ export function CameraRig({
   const tmp = useRef(new THREE.Vector3());
   useFrame((_, dt) => {
     const cam = camera as THREE.PerspectiveCamera;
-    const aspect = size.width / size.height;
+    const reserve = Math.min(typeof reserveRight === "function" ? reserveRight(size.width) : reserveRight, size.width * 0.3);
+    const aspect = (size.width - reserve) / size.height;
     const vfov = THREE.MathUtils.degToRad(cam.fov);
     const distW = width / 2 / (Math.tan(vfov / 2) * aspect);
     const distH = depth / 2 / Math.tan(vfov / 2);
     const dist = Math.max(distW, distH) * 1.08;
+    // slide the framing so the subject centres in the space left of the reserved strip
+    const shift = (reserve / 2 / size.width) * 2 * dist * Math.tan(vfov / 2) * (size.width / size.height);
     const px = parallax && !reduced ? pointer.x * 0.25 : 0;
     const py = parallax && !reduced ? pointer.y * 0.15 : 0;
-    tmp.current.set(target[0], target[1], target[2]);
+    tmp.current.set(target[0] + shift, target[1], target[2]);
     const k = reduced ? 1 : 1 - Math.exp(-3.2 * Math.min(dt, 0.05));
     look.current.lerp(tmp.current, k);
     const desired = tmp.current.copy(dir.current).multiplyScalar(dist).add(look.current);

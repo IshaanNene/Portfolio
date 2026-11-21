@@ -65,7 +65,7 @@ export function DiaryFallback({ interactive = true, className }: { interactive?:
             <Image src={site.photo} alt={site.photoAlt} width={320} height={400} unoptimized={isSvg} priority className="aspect-[4/5] w-full border-2 border-ink object-cover" />
             <span className="absolute bottom-0.5 left-2 font-hand text-lg font-bold">that&rsquo;s me ↑</span>
           </span>
-          <span className="absolute bottom-10 left-9 w-[42%] -rotate-3 bg-[#fff4b8] p-2 font-hand text-lg font-bold leading-tight shadow-[3px_4px_0_rgba(0,0,0,.25)]">
+          <span className="absolute bottom-10 left-9 w-[42%] -rotate-3 bg-[#EFE3C0] p-2 font-hand text-lg font-bold leading-tight shadow-[3px_4px_0_rgba(0,0,0,.25)]">
             {site.coverNote.replace("[PLACEHOLDER] ", "")}
           </span>
           <span
@@ -74,7 +74,7 @@ export function DiaryFallback({ interactive = true, className }: { interactive?:
               e.stopPropagation();
               findEgg("donotpress");
             }}
-            className="absolute bottom-3 right-3 grid h-12 w-12 place-items-center rounded-full border-[3px] border-white bg-[#e23b2e] text-center font-display text-[8px] font-extrabold leading-none text-white outline outline-2 outline-ink"
+            className="absolute bottom-3 right-3 grid h-12 w-12 place-items-center rounded-full border-[3px] border-white bg-[#9E2B20] text-center font-display text-[8px] font-extrabold leading-none text-white outline outline-2 outline-ink"
           >
             DO NOT
             <br />

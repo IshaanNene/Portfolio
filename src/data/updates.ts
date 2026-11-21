@@ -15,9 +15,9 @@ export type StickyNoteData = {
 };
 
 export const noteColor: Record<NoteKind, string> = {
-  building: "#FFD84D",
-  learning: "#9DDC8B",
-  experiment: "#FF755E",
+  building: "#D9A441",
+  learning: "#8FA05A",
+  experiment: "#D2693A",
   update: "#FFFFFF",
   reading: "#a9c3ff",
 };

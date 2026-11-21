@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function MusicPage() {
   return (
     <PageShell>
-      <PageHeader page="10" kicker="side B · the record shelf" color="bg-[#FFB3C7]" title={<>Mu&shy;sic.</>} note="the non-technical page. mostly." />
+      <PageHeader page="10" kicker="side B · the record shelf" color="bg-[#B5835A]" title={<>Mu&shy;sic.</>} note="the non-technical page. mostly." />
 
       <section aria-labelledby="turntable">
         <SectionHeading id="turntable" note="what's on right now">The turntable</SectionHeading>

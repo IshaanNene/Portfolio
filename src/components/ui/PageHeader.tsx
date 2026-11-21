@@ -4,10 +4,10 @@ import { Hand, ScribbleArrow } from "./Typography";
 import { PostageStamp, StarSticker, Washi, type WashiPattern } from "./Scrapbook";
 
 const WASHI: { color: string; pattern: WashiPattern }[] = [
-  { color: "#FF755E", pattern: "stripe" },
-  { color: "#477BFF", pattern: "dots" },
-  { color: "#9DDC8B", pattern: "grid" },
-  { color: "#FFD84D", pattern: "check" },
+  { color: "#D2693A", pattern: "stripe" },
+  { color: "#3E5C76", pattern: "dots" },
+  { color: "#8FA05A", pattern: "grid" },
+  { color: "#D9A441", pattern: "check" },
 ];
 
 /**

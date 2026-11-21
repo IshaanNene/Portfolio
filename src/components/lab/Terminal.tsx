@@ -81,7 +81,7 @@ function MatrixRain({ onEnd }: { onEnd: () => void }) {
     const tick = () => {
       ctx.fillStyle = "rgba(10,10,10,0.18)";
       ctx.fillRect(0, 0, c.width, c.height);
-      ctx.fillStyle = "#9DDC8B";
+      ctx.fillStyle = "#8FA05A";
       ctx.font = "14px monospace";
       drops.forEach((y, i) => {
         ctx.fillText(String.fromCharCode(0x30a0 + Math.random() * 96), i * 14, y * 14);
@@ -177,7 +177,7 @@ export function Terminal() {
         <div
           ref={scroller}
           className="relative h-[26rem] overflow-y-auto p-4 font-mono text-[13px] leading-6 sm:h-[30rem] sm:text-sm"
-          style={{ textShadow: amber ? "0 0 6px rgba(255,179,71,.35)" : "0 0 6px rgba(157,220,139,.35)" }}
+          style={{ textShadow: amber ? "0 0 6px rgba(255,179,71,.35)" : "0 0 6px rgba(143,160,90,.35)" }}
           role="log"
           aria-live="polite"
           aria-label="Terminal output"

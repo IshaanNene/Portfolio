@@ -46,7 +46,7 @@ export function Turntable() {
         <div className="relative aspect-[5/4] border-[3px] border-ink bg-[#b9814f] p-5 shadow-brutal-xl" style={{ backgroundImage: "repeating-linear-gradient(92deg, rgba(90,50,20,.12) 0 3px, transparent 3px 11px)" }}>
           <div className="relative h-full w-[78%]">
             <span aria-hidden className="absolute inset-0 rounded-full bg-ink/80" />
-            <Vinyl label="#FFB3C7" spinning={on} className="absolute inset-[2%]" />
+            <Vinyl label="#B5835A" spinning={on} className="absolute inset-[2%]" />
           </div>
           {/* tonearm */}
           <motion.svg
@@ -82,7 +82,7 @@ export function Turntable() {
       {/* now playing card + currently listening */}
       <div className="relative flex flex-col items-start gap-10">
         <div className="relative w-full max-w-sm rotate-[1.5deg] border-[3px] border-ink bg-paper p-5 shadow-brutal-lg">
-          <Washi pattern="stripe" color="#FFB3C7" className="-top-3 left-8 -rotate-6" />
+          <Washi pattern="stripe" color="#B5835A" className="-top-3 left-8 -rotate-6" />
           <p className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em]">
             <span className={cn("h-3 w-3 rounded-full border-2 border-ink", on ? "animate-pulse-dot bg-[#2fa046]" : "bg-coral")} />
             {on ? "now spinning" : "on the platter"}
@@ -181,13 +181,13 @@ export function GuitarCorner() {
       {/* photos */}
       <div className="relative flex min-h-[18rem] flex-wrap items-start justify-center gap-4 sm:block">
         <div className="relative sm:absolute sm:left-2 sm:top-4 sm:-rotate-6">
-          <Washi pattern="dots" color="#FFB3C7" className="-top-3 left-1/2 -translate-x-1/2 rotate-3 !w-20" />
+          <Washi pattern="dots" color="#B5835A" className="-top-3 left-1/2 -translate-x-1/2 rotate-3 !w-20" />
           <PhotoCard
             src={guitar.photos[0].src ? `${base}${guitar.photos[0].src}` : undefined}
             alt="Me with my guitar"
             caption={guitar.photos[0].caption}
             back={clean(guitar.photos[0].back)}
-            tint="#FFD84D"
+            tint="#D9A441"
             size="md"
           />
         </div>
@@ -216,7 +216,7 @@ export function GuitarCorner() {
           <p className="mt-3 font-hand text-2xl font-bold leading-tight">
             learning: <HoverNote note="slowly. very slowly.">{clean(guitar.learning)}</HoverNote>
           </p>
-          <HandArrow className="absolute -bottom-6 right-4 rotate-[160deg]" color="#FF755E" />
+          <HandArrow className="absolute -bottom-6 right-4 rotate-[160deg]" color="#D2693A" />
         </div>
       </TornPaper>
 
@@ -224,7 +224,7 @@ export function GuitarCorner() {
       <div className="flex flex-col items-center gap-8 md:col-span-2 md:flex-row md:justify-center lg:col-span-1 lg:flex-col">
         <Sticker label="guitar pick sticker">
           <svg viewBox="0 0 100 110" className="h-24 w-24" aria-hidden>
-            <path d="M50 104 C 20 78 6 52 8 30 C 10 10 30 4 50 4 C 70 4 90 10 92 30 C 94 52 80 78 50 104 Z" fill="#FF755E" stroke="#fff" strokeWidth="10" paintOrder="stroke" />
+            <path d="M50 104 C 20 78 6 52 8 30 C 10 10 30 4 50 4 C 70 4 90 10 92 30 C 94 52 80 78 50 104 Z" fill="#D2693A" stroke="#fff" strokeWidth="10" paintOrder="stroke" />
             <path d="M50 104 C 20 78 6 52 8 30 C 10 10 30 4 50 4 C 70 4 90 10 92 30 C 94 52 80 78 50 104 Z" fill="none" stroke="#171717" strokeWidth="3.5" />
             <text x="50" y="48" textAnchor="middle" fontSize="15" fontWeight="800" fill="#171717" style={{ fontFamily: "var(--font-display)" }}>
               .73mm

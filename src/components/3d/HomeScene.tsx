@@ -35,14 +35,17 @@ function BookRig({ spread, focus, reduced, children }: { spread: number; focus: 
   );
 }
 
+/** Room kept for the bookmark tabs: full labels from 1440px, compact tabs from 768px, none on phones. */
+const tabSpace = (w: number) => (w >= 1440 ? 170 : w >= 768 ? 70 : 0);
+
 export default function HomeScene(
   props: Omit<DiaryProps, "quality"> & { quality: "low" | "high"; focus: Focus; wide: boolean },
 ) {
   const { spread, focus, quality, reduced, wide } = props;
-  const frameW = spread === 0 ? COVER_W * 1.35 : focus === "spread" ? COVER_W * 2.2 : focus === "right" ? COVER_W * 1.3 : COVER_W * 1.14;
+  const frameW = spread === 0 ? COVER_W * 1.35 : focus === "spread" ? COVER_W * 2.36 : focus === "right" ? COVER_W * 1.3 : COVER_W * 1.14;
   return (
     <Scene quality={quality} className="!absolute inset-0 touch-pan-y">
-      <CameraRig target={[0, 0.05, 0.08]} width={frameW} depth={COVER_H * 1.12} reduced={reduced} />
+      <CameraRig target={[0, 0.05, 0.08]} width={frameW} depth={COVER_H * 1.12} reduced={reduced} reserveRight={tabSpace} />
       <Desk quality={quality} reduced={reduced} wide={wide} />
       <BookRig spread={spread} focus={focus} reduced={reduced}>
         <Diary {...props} />

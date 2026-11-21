@@ -104,7 +104,7 @@ export function Envelope() {
             {/* airmail edging along the bottom */}
             <div
               className="pointer-events-none absolute inset-x-[3px] bottom-[3px] h-2.5"
-              style={{ background: "repeating-linear-gradient(-45deg, #FF755E 0 12px, #fbf5e8 12px 20px, #477BFF 20px 32px, #fbf5e8 32px 40px)" }}
+              style={{ background: "repeating-linear-gradient(-45deg, #D2693A 0 12px, #fbf5e8 12px 20px, #3E5C76 20px 32px, #fbf5e8 32px 40px)" }}
               aria-hidden
             />
             <div className="pointer-events-none absolute bottom-[34%] right-[18%] hidden origin-bottom-right scale-[0.62] sm:block">
@@ -156,8 +156,8 @@ export function Envelope() {
             className="paper-grain relative mx-auto border-[3px] border-ink bg-[#fbf5e8] shadow-brutal-xl"
             aria-label="Letter"
           >
-            <Washi pattern="dots" color="#FF755E" className="-top-3 left-10 -rotate-6" />
-            <Washi pattern="stripe" color="#9DDC8B" className="-top-3 right-10 rotate-[7deg]" />
+            <Washi pattern="dots" color="#D2693A" className="-top-3 left-10 -rotate-6" />
+            <Washi pattern="stripe" color="#8FA05A" className="-top-3 right-10 rotate-[7deg]" />
             <Fold index={0} open reduced={reduced}>
               <div className="p-6 sm:p-10">
                 <p className="font-hand text-4xl font-bold">Dear visitor,</p>

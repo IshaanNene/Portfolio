@@ -59,7 +59,7 @@ export default function NowPage() {
               <p className="relative font-hand text-2xl font-bold leading-snug">
                 a desk calendar of notes-to-self. tear a page off — there&rsquo;s always another one underneath.
               </p>
-              <StarSticker className="relative mt-3 h-10 w-10 rotate-12" color="#9DDC8B" />
+              <StarSticker className="relative mt-3 h-10 w-10 rotate-12" color="#8FA05A" />
             </div>
           </div>
         </section>

@@ -173,13 +173,13 @@ export function HomeExperience() {
             transition={{ delay: 0.6 }}
             className="absolute left-[8%] top-[24%] hidden -rotate-6 text-coral lg:block"
           >
-            <Hand className="block text-3xl text-ink">click to open me!</Hand>
+            <Hand className="block text-3xl text-cream">click to open me!</Hand>
             <ScribbleArrow className="ml-24 mt-1 h-14 w-28 rotate-[30deg]" />
           </motion.div>
         )}
         {use3D && ready && spread === 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="absolute bottom-[14%] right-[6%] hidden max-w-[11rem] rotate-3 xl:block">
-            <Hand className="text-2xl text-ink-soft">psst — don&rsquo;t press the red sticker</Hand>
+            <Hand className="text-2xl text-cream/80">psst — don&rsquo;t press the red seal</Hand>
           </motion.div>
         )}
 

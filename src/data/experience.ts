@@ -1,7 +1,6 @@
 /**
  * EXPERIENCE — printed on the receipt at /experience.
- * Every entry below is a PLACEHOLDER. Replace with your real history;
- * delete entries you don't need. Nothing here is real.
+ * Companies are real; anything in [brackets] still needs your details.
  */
 
 export type ExperienceEntry = {
@@ -23,7 +22,7 @@ export const experience: ExperienceEntry[] = [
   {
     id: "exp-1",
     role: "[Job Title]",
-    company: "[Company Name]",
+    company: "IBM",
     location: "[City / Remote]",
     start: "[MMM YYYY]",
     end: "Present",
@@ -39,23 +38,9 @@ export const experience: ExperienceEntry[] = [
     placeholder: true,
   },
   {
-    id: "exp-2",
-    role: "[Job Title]",
-    company: "[Company Name]",
-    location: "[City / Remote]",
-    start: "[MMM YYYY]",
-    end: "[MMM YYYY]",
-    type: "internship",
-    responsibilities: ["[Responsibility]", "[Responsibility]"],
-    achievements: ["[Achievement]"],
-    impact: "[Technical impact]",
-    stack: ["[Tech]", "[Tech]"],
-    placeholder: true,
-  },
-  {
     id: "exp-3",
     role: "[Degree / Programme]",
-    company: "[University / School]",
+    company: "PES University",
     start: "[YYYY]",
     end: "[YYYY]",
     type: "education",

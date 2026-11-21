@@ -18,6 +18,7 @@ type Props = {
   cover: THREE.Texture;
   inside: THREE.Texture;
   cloth: THREE.Texture;
+  leatherMaps: { normal: THREE.Texture | null; rough: THREE.Texture | null };
   sticker: THREE.Texture;
   layers: CoverLayers;
   shadows: boolean;
@@ -30,7 +31,7 @@ type Props = {
  * Hard front cover hinged at the spine. Box faces: +z is the printed cover,
  * -z is the endpaper (reads correctly once the cover swings over).
  */
-export function DiaryCover({ width, height, thickness, hingeZ, open, cover, inside, cloth, sticker, layers, shadows, reduced, onFaceClick, onStickerPress }: Props) {
+export function DiaryCover({ width, height, thickness, hingeZ, open, cover, inside, cloth, leatherMaps, sticker, layers, shadows, reduced, onFaceClick, onStickerPress }: Props) {
   const pivot = useRef<THREE.Group>(null);
   const stickerRef = useRef<THREE.Group>(null);
   const progress = useRef(open ? 1 : 0);
@@ -39,16 +40,17 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
   useCursor(hover);
 
   const materials = useMemo(() => {
-    const side = new THREE.MeshStandardMaterial({ map: cloth, roughness: 0.85 });
+    const grain = { normalMap: leatherMaps.normal, roughnessMap: leatherMaps.rough, normalScale: new THREE.Vector2(1.6, 1.6) };
+    const side = new THREE.MeshStandardMaterial({ map: cloth, roughness: 0.9, ...grain });
     return [
       side,
       side,
       side,
       side,
-      new THREE.MeshStandardMaterial({ map: cover, roughness: 0.8 }),
+      new THREE.MeshStandardMaterial({ map: cover, roughness: 0.95, ...grain }),
       new THREE.MeshStandardMaterial({ map: inside, roughness: 0.95 }),
     ];
-  }, [cover, inside, cloth]);
+  }, [cover, inside, cloth, leatherMaps]);
 
   useFrame((_, dt) => {
     const target = open ? 1 : 0;
@@ -85,9 +87,9 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
       </mesh>
       {/* objects glued onto the cover — each a separate physical layer */}
       <group position={[0, 0, thickness / 2]}>
-        <CoverPiece W={width} H={height} cx={500} cy={300} w={740} h={300} rot={0.025} lift={0.006} map={layers.nameplate} edge="#e8c13a" shadows={shadows} />
-        <CoverPiece W={width} H={height} cx={722} cy={830} w={350} h={420} rot={-0.06} lift={0.01} map={layers.photo} edge="#f4f4f4" shadows={shadows} />
-        <CoverPiece W={width} H={height} cx={339} cy={810} w={380} h={360} rot={0.05} lift={0.005} map={layers.note} edge="#f2e59a" shadows={shadows} fold />
+        <CoverPiece W={width} H={height} cx={500} cy={300} w={740} h={300} rot={0.025} lift={0.006} map={layers.nameplate} edge="#d9c9a6" shadows={shadows} />
+        <CoverPiece W={width} H={height} cx={722} cy={830} w={350} h={420} rot={-0.06} lift={0.01} map={layers.photo} edge="#e6dcc8" shadows={shadows} />
+        <CoverPiece W={width} H={height} cx={339} cy={810} w={380} h={360} rot={0.05} lift={0.005} map={layers.note} edge="#d8c8a4" shadows={shadows} fold />
         {/* tape holding the photo and the note */}
         <Tape3D W={width} H={height} cx={735} cy={622} w={190} rot={0.12} z={0.017} />
         <Tape3D W={width} H={height} cx={330} cy={650} w={150} rot={-0.18} z={0.012} />
@@ -101,7 +103,7 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
       </group>
 
       {/* "DO NOT PRESS" sticker — a tiny physical decal on the cover */}
-      <group ref={stickerRef} position={[width * 0.8, -height * 0.3, thickness / 2 + 0.005]} rotation={[0, 0, 0.2]}>
+      <group ref={stickerRef} position={[width * 0.84, -height * 0.39, thickness / 2 + 0.005]} rotation={[0, 0, 0.2]}>
         <mesh
           rotation={[Math.PI / 2, 0, 0]}
           onPointerOver={(e) => {
@@ -115,10 +117,10 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
             onStickerPress();
           }}
         >
-          <cylinderGeometry args={[0.13, 0.13, 0.008, 40]} />
-          <meshStandardMaterial attach="material-0" color="#ffffff" />
-          <meshStandardMaterial attach="material-1" map={sticker} roughness={0.4} />
-          <meshStandardMaterial attach="material-2" map={sticker} roughness={0.4} />
+          <cylinderGeometry args={[0.12, 0.125, 0.014, 40]} />
+          <meshStandardMaterial attach="material-0" color="#5e1510" roughness={0.35} />
+          <meshStandardMaterial attach="material-1" map={sticker} roughness={0.3} />
+          <meshStandardMaterial attach="material-2" map={sticker} roughness={0.3} />
         </mesh>
       </group>
     </group>
@@ -163,10 +165,10 @@ function CoverPiece({
   const flap = Math.min(sw, sh) * 0.2;
   return (
     <group position={[px(W, cx), py(H, cy), 0]} rotation={[0, 0, rot]}>
-      {/* hard neo-brutalist offset shadow */}
-      <mesh position={[0.022, -0.026, 0.0015]}>
-        <planeGeometry args={[sw, sh]} />
-        <meshBasicMaterial color="#171717" transparent opacity={0.85} />
+      {/* soft contact shadow on the leather */}
+      <mesh position={[0.012, -0.016, 0.0015]}>
+        <planeGeometry args={[sw * 1.02, sh * 1.02]} />
+        <meshBasicMaterial color="#0d0602" transparent opacity={0.45} depthWrite={false} />
       </mesh>
       <mesh position={[0, 0, lift]} castShadow={shadows} receiveShadow={shadows}>
         <boxGeometry args={[sw, sh, t]} />
@@ -182,7 +184,7 @@ function CoverPiece({
         <group position={[sw / 2 - flap / 2, -sh / 2 + flap / 2, lift + t / 2]} rotation={[0, 0, Math.PI / 4]}>
           <mesh rotation={[-0.75, 0, 0]} position={[0, 0, 0.001]}>
             <shapeGeometry args={[foldShape(flap)]} />
-            <meshStandardMaterial color="#e9d98a" side={THREE.DoubleSide} roughness={0.8} />
+            <meshStandardMaterial color="#cdbb92" side={THREE.DoubleSide} roughness={0.8} />
           </mesh>
         </group>
       )}
@@ -204,7 +206,7 @@ function Tape3D({ W, H, cx, cy, w, rot, z }: { W: number; H: number; cx: number;
   return (
     <mesh position={[px(W, cx), py(H, cy), z]} rotation={[0, 0, rot]}>
       <planeGeometry args={[(w / 1000) * W, (46 / 1400) * H]} />
-      <meshStandardMaterial color="#fff2b3" transparent opacity={0.72} roughness={0.4} depthWrite={false} />
+      <meshStandardMaterial color="#d9bf8c" transparent opacity={0.78} roughness={0.6} depthWrite={false} />
     </mesh>
   );
 }

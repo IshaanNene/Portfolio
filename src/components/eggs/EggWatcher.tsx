@@ -23,7 +23,7 @@ export function EggWatcher() {
   useEffect(() => {
     console.log(
       "%c psst. %c\nYou opened the back of the diary.\nThere are " + total + " easter eggs on this site. Try the Lab terminal → `secret`.",
-      "background:#FFD84D;color:#171717;font:900 18px sans-serif;padding:4px 8px;border:3px solid #171717",
+      "background:#D9A441;color:#171717;font:900 18px sans-serif;padding:4px 8px;border:3px solid #171717",
       "font:14px monospace",
     );
   }, []);
