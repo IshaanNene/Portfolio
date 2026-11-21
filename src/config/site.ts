@@ -35,7 +35,7 @@ export const site = {
    * Empty src = painted placeholder.
    */
   deskPhotos: [
-    { src: "", caption: "the desk", date: "'26" },
+    { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/ishaan.webp`, caption: "grad day!", date: "'25" },
     { src: "", caption: "first commit", date: "'26" },
     { src: "", caption: "me + guitar", date: "'26" },
   ] as { src: string; caption: string; date: string }[],

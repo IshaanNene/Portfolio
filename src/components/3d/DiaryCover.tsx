@@ -36,6 +36,8 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
   const stickerRef = useRef<THREE.Group>(null);
   const progress = useRef(open ? 1 : 0);
   const spin = useRef(0);
+  const peek = useRef(0);
+  const coverHover = useRef(false);
   const [hover, setHover] = useState(false);
   useCursor(hover);
 
@@ -58,7 +60,9 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
     if (pivot.current) {
       // ease-in-out bias + tiny overshoot feel
       const p = progress.current;
-      pivot.current.rotation.y = -p * (Math.PI + FLIP_EPS);
+      // hovering the closed diary lifts the cover a touch, like a thumb under the edge
+      peek.current = reduced ? 0 : THREE.MathUtils.damp(peek.current, coverHover.current && !open ? 1 : 0, 7, Math.min(dt, 0.05));
+      pivot.current.rotation.y = -p * (Math.PI + FLIP_EPS) - peek.current * 0.09;
       // lift slightly while swinging so it never clips the pages
       pivot.current.position.z = hingeZ + Math.sin(p * Math.PI) * 0.03;
     }
@@ -76,6 +80,8 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
         material={materials}
         castShadow={shadows}
         receiveShadow={shadows}
+        onPointerOver={() => (coverHover.current = true)}
+        onPointerOut={() => (coverHover.current = false)}
         onClick={(e) => {
           e.stopPropagation();
           // which side was hit? the face normal in local space tells us
@@ -117,10 +123,10 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
             onStickerPress();
           }}
         >
-          <cylinderGeometry args={[0.12, 0.125, 0.014, 40]} />
-          <meshStandardMaterial attach="material-0" color="#5e1510" roughness={0.35} />
-          <meshStandardMaterial attach="material-1" map={sticker} roughness={0.3} />
-          <meshStandardMaterial attach="material-2" map={sticker} roughness={0.3} />
+          <cylinderGeometry args={[0.13, 0.13, 0.008, 40]} />
+          <meshStandardMaterial attach="material-0" color="#ffffff" />
+          <meshStandardMaterial attach="material-1" map={sticker} roughness={0.4} />
+          <meshStandardMaterial attach="material-2" map={sticker} roughness={0.4} />
         </mesh>
       </group>
     </group>
@@ -163,8 +169,25 @@ function CoverPiece({
   const sh = (h / 1400) * H;
   const t = 0.004;
   const flap = Math.min(sw, sh) * 0.2;
+  const g = useRef<THREE.Group>(null);
+  const over = useRef(false);
+  const k = useRef(0);
+  useFrame((_, dt) => {
+    if (!g.current) return;
+    k.current = THREE.MathUtils.damp(k.current, over.current ? 1 : 0, 9, Math.min(dt, 0.05));
+    // lift off the leather and twist slightly toward the reader
+    g.current.position.z = k.current * 0.025;
+    g.current.rotation.z = rot - k.current * rot * 0.6;
+    g.current.rotation.x = k.current * 0.05;
+  });
   return (
-    <group position={[px(W, cx), py(H, cy), 0]} rotation={[0, 0, rot]}>
+    <group
+      ref={g}
+      position={[px(W, cx), py(H, cy), 0]}
+      rotation={[0, 0, rot]}
+      onPointerOver={() => (over.current = true)}
+      onPointerOut={() => (over.current = false)}
+    >
       {/* hard neo-brutalist offset shadow on the leather */}
       <mesh position={[0.02, -0.024, 0.0015]}>
         <planeGeometry args={[sw, sh]} />

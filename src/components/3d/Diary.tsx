@@ -5,6 +5,7 @@ import { Edges, useCursor } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { chapterTabs, diaryBlockTop, diaryInsideCover, diaryPages, type ChapterTab } from "@/data/diary";
+import { play } from "@/lib/sound";
 import { DiaryCover, type CoverLayers } from "./DiaryCover";
 import { DiaryPage } from "./DiaryPages";
 import {
@@ -218,8 +219,33 @@ function Ribbon({ x, len, yaw, color, drop }: { x: number; len: number; yaw: num
   }, [len]);
   const run = 0.13;
   const slope = Math.hypot(run, drop);
+  // a tug sets the ribbon swinging; it settles back on its own
+  const g = useRef<THREE.Group>(null);
+  const amp = useRef(0);
+  const [over, setOver] = useState(false);
+  useCursor(over);
+  useFrame(({ clock }, dt) => {
+    if (!g.current) return;
+    amp.current = Math.max(0, amp.current - Math.min(dt, 0.05) * 0.9);
+    g.current.rotation.z = yaw + Math.sin(clock.elapsedTime * 13) * amp.current * 0.16;
+  });
   return (
-    <group position={[x, -PAGE_HEIGHT / 2 + 0.02, -0.025]} rotation={[0, 0, yaw]}>
+    <group
+      ref={g}
+      position={[x, -PAGE_HEIGHT / 2 + 0.02, -0.025]}
+      rotation={[0, 0, yaw]}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setOver(true);
+        amp.current = Math.max(amp.current, 0.45);
+      }}
+      onPointerOut={() => setOver(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        amp.current = 1;
+        play("tick");
+      }}
+    >
       <mesh position={[0, -run / 2, -drop / 2]} rotation={[Math.atan2(drop, run), 0, 0]}>
         <planeGeometry args={[W, slope]} />
         <meshStandardMaterial color={color} roughness={0.35} metalness={0.05} side={THREE.DoubleSide} />

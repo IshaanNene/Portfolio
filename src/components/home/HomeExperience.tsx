@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { site } from "@/config/site";
 import { faceLink, SPREAD_COUNT, spreadFaces } from "@/data/diary";
 import { useWebGL } from "@/hooks/useWebGL";
+import { deskDrag } from "@/lib/deskDrag";
 import { findEgg } from "@/lib/eggs";
 import { play } from "@/lib/sound";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,15 @@ import { StatusPill } from "./StatusPill";
 const HomeScene = dynamic(() => import("@/components/3d/HomeScene"), { ssr: false });
 
 const MAX = SPREAD_COUNT - 1;
+
+/** Handwritten asides that turn up only after a while of doing nothing — one at a time. */
+const IDLE_NOTES = [
+  { text: "still there? flip a page →", pos: "left-[7%] top-[56%]", rot: -4 },
+  { text: "tip: the washi rolls, pencil & photos on the desk can be moved", pos: "left-[5%] top-[38%]", rot: 3 },
+  { text: "← → arrow keys work too", pos: "left-[40%] top-[9%]", rot: -2 },
+  { text: "tug a ribbon bookmark. go on.", pos: "left-[36%] bottom-[20%]", rot: 2 },
+  { text: "there's a page that was never bound in…", pos: "left-[6%] bottom-[24%]", rot: -3 },
+];
 type Side = "left" | "right";
 
 export function HomeExperience() {
@@ -32,6 +42,7 @@ export function HomeExperience() {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const swipe = useRef<{ x: number; y: number } | null>(null);
+  const [idleNote, setIdleNote] = useState<number | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -79,6 +90,37 @@ export function HomeExperience() {
   }, [next, prev]);
 
   const use3D = tier !== null && tier !== "none" && !failed;
+
+  // occasional handwritten aside after ~14s of no input; any input tucks it away again
+  useEffect(() => {
+    if (!use3D || !ready) return;
+    let shown = 0;
+    let wait = 0;
+    let hide = 0;
+    const schedule = () => {
+      window.clearTimeout(wait);
+      wait = window.setTimeout(() => {
+        setIdleNote(shown++ % IDLE_NOTES.length);
+        hide = window.setTimeout(() => {
+          setIdleNote(null);
+          schedule();
+        }, 7000);
+      }, 14000);
+    };
+    const poke = () => {
+      window.clearTimeout(hide);
+      setIdleNote(null);
+      schedule();
+    };
+    schedule();
+    const evs = ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"] as const;
+    evs.forEach((ev) => window.addEventListener(ev, poke, { passive: true }));
+    return () => {
+      window.clearTimeout(wait);
+      window.clearTimeout(hide);
+      evs.forEach((ev) => window.removeEventListener(ev, poke));
+    };
+  }, [use3D, ready]);
   const [left, right] = spread === 0 ? [null, null] : spreadFaces(spread);
   const visibleFaces = spread === 0 ? [] : narrow ? [side === "left" ? left : right] : [left, right];
   const links = visibleFaces.map((f) => (f ? faceLink(f) : null)).filter(Boolean) as { href: string; label: string }[];
@@ -99,7 +141,7 @@ export function HomeExperience() {
         onPointerUp={(e) => {
           const s = swipe.current;
           swipe.current = null;
-          if (!s) return;
+          if (!s || deskDrag.active) return;
           const dx = e.clientX - s.x;
           if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(e.clientY - s.y)) (dx < 0 ? next : prev)();
         }}
@@ -177,9 +219,28 @@ export function HomeExperience() {
             <ScribbleArrow className="ml-24 mt-1 h-14 w-28 rotate-[30deg]" />
           </motion.div>
         )}
+        <AnimatePresence>
+          {use3D && ready && idleNote !== null && (
+            <motion.div
+              key={idleNote}
+              aria-hidden
+              initial={{ opacity: 0, y: reduced ? 0 : 8, rotate: IDLE_NOTES[idleNote].rot - 2 }}
+              animate={{ opacity: 1, y: 0, rotate: IDLE_NOTES[idleNote].rot }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduced ? 0 : 0.5 }}
+              className={cn("pointer-events-none absolute z-10 hidden max-w-[15rem] md:block", IDLE_NOTES[idleNote].pos)}
+            >
+              <div className="relative border-2 border-ink bg-paper px-3 pb-2 pt-3 shadow-brutal">
+                <span className="absolute -top-2.5 left-1/2 h-4 w-14 -translate-x-1/2 rotate-2 bg-sun/80" />
+                <Hand className="text-xl leading-tight text-ink">{IDLE_NOTES[idleNote].text}</Hand>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {use3D && ready && spread === 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="absolute bottom-[14%] right-[6%] hidden max-w-[11rem] rotate-3 xl:block">
-            <Hand className="text-2xl text-cream/80">psst — don&rsquo;t press the red seal</Hand>
+            <Hand className="text-2xl text-cream/80">psst — don&rsquo;t press the red sticker</Hand>
           </motion.div>
         )}
 

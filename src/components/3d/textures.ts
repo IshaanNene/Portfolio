@@ -1553,41 +1553,22 @@ export function paintCloth(color: string, scale: number) {
 
 export function paintDoNotPress(f: Fonts) {
   const { c, ctx } = canvas(1, 256, 256);
-  const r = seeded(77);
-  // irregular wax blob
+  ctx.fillStyle = "#FFFFFF";
   ctx.beginPath();
-  for (let i = 0; i <= 28; i++) {
-    const a = (i / 28) * Math.PI * 2;
-    const rad = 118 + (r() - 0.5) * 14;
-    const x = 128 + Math.cos(a) * rad;
-    const y = 128 + Math.sin(a) * rad;
-    if (i) ctx.lineTo(x, y);
-    else ctx.moveTo(x, y);
-  }
-  const g = ctx.createRadialGradient(100, 96, 10, 128, 128, 130);
-  g.addColorStop(0, "#b3362a");
-  g.addColorStop(0.7, "#7d1d16");
-  g.addColorStop(1, "#4d0f0b");
-  ctx.fillStyle = g;
+  ctx.arc(128, 128, 126, 0, Math.PI * 2);
   ctx.fill();
-  // pressed inner ring
+  ctx.fillStyle = "#E23B2E";
+  ctx.beginPath();
+  ctx.arc(128, 128, 110, 0, Math.PI * 2);
+  ctx.fill();
   ctx.lineWidth = 6;
-  ctx.strokeStyle = "rgba(40,5,3,0.6)";
-  ctx.beginPath();
-  ctx.arc(129, 130, 86, 0, Math.PI * 2);
+  ctx.strokeStyle = INK;
   ctx.stroke();
-  ctx.strokeStyle = "rgba(230,120,100,0.35)";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(127, 127, 86, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.fillStyle = "#FFFFFF";
   ctx.textAlign = "center";
-  ctx.font = `800 34px ${f.display}`;
-  for (const [dx, col] of [[2, "rgba(40,5,3,0.7)"], [0, "rgba(255,190,170,0.75)"]] as const) {
-    ctx.fillStyle = col;
-    ctx.fillText("DO NOT", 128 + dx, 122 + dx);
-    ctx.fillText("PRESS", 128 + dx, 160 + dx);
-  }
+  ctx.font = `800 44px ${f.display}`;
+  ctx.fillText("DO NOT", 128, 118);
+  ctx.fillText("PRESS", 128, 168);
   return toTexture(c, 4);
 }
 

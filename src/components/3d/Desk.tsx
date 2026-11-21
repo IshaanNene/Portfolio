@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useCursor } from "@react-three/drei";
 import * as THREE from "three";
+import { deskDrag } from "@/lib/deskDrag";
+import { play } from "@/lib/sound";
 import { site } from "@/config/site";
 import { Decal, Mug, PaperClip3D, Pencil, Polaroid3D, StickyNote3D, WashiRoll } from "./props";
 import { loadFonts, paintBlobShadow, paintCuttingMat, paintDecal, paintDeskPhoto, paintInkNote, paintSticky, paintTornSheet, paintWashi, readFonts } from "./textures";
@@ -39,6 +43,76 @@ function Sheet({ map, w, h, curl = 0.05, seed = 1 }: { map: THREE.Texture; w: nu
     <mesh rotation={[-Math.PI / 2, 0, 0]} geometry={geo} receiveShadow castShadow>
       <meshStandardMaterial map={map} transparent alphaTest={0.4} roughness={1} side={THREE.DoubleSide} />
     </mesh>
+  );
+}
+
+const FLOOR = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+/**
+ * Something on the desk you can pick up and put down somewhere else.
+ * It lifts a little on hover, more while carried, and stays where it's dropped
+ * (until the page reloads — desks get tidied).
+ */
+function Movable({ position, rotation = [0, 0, 0], reduced, children }: { position: [number, number, number]; rotation?: [number, number, number]; reduced: boolean; children: React.ReactNode }) {
+  const g = useRef<THREE.Group>(null);
+  const off = useRef<THREE.Vector3 | null>(null);
+  const hit = useMemo(() => new THREE.Vector3(), []);
+  const lift = useRef(0);
+  const [hover, setHover] = useState(false);
+  const [held, setHeld] = useState(false);
+  useCursor(hover || held, held ? "grabbing" : "grab");
+  useFrame((_, dt) => {
+    if (!g.current) return;
+    const target = held ? 0.07 : hover ? 0.018 : 0;
+    lift.current = reduced ? target : THREE.MathUtils.damp(lift.current, target, 12, Math.min(dt, 0.05));
+    g.current.position.y = position[1] + lift.current;
+  });
+  const local = (e: ThreeEvent<PointerEvent>) => {
+    if (!g.current?.parent || !e.ray.intersectPlane(FLOOR, hit)) return null;
+    return g.current.parent.worldToLocal(hit.clone());
+  };
+  const target = (e: ThreeEvent<PointerEvent>) => e.target as unknown as Element;
+  return (
+    <group
+      ref={g}
+      position={position}
+      rotation={rotation}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHover(true);
+      }}
+      onPointerOut={() => setHover(false)}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        const p = local(e);
+        if (!p || !g.current) return;
+        off.current = new THREE.Vector3(g.current.position.x - p.x, 0, g.current.position.z - p.z);
+        deskDrag.active = true;
+        target(e).setPointerCapture?.(e.pointerId);
+        setHeld(true);
+        play("tick");
+      }}
+      onPointerMove={(e) => {
+        if (!off.current || !g.current) return;
+        e.stopPropagation();
+        const p = local(e);
+        if (!p) return;
+        g.current.position.x = THREE.MathUtils.clamp(p.x + off.current.x, -3.7, 3.7);
+        g.current.position.z = THREE.MathUtils.clamp(p.z + off.current.z, -2.4, 2.5);
+      }}
+      onPointerUp={(e) => {
+        if (!off.current) return;
+        e.stopPropagation();
+        off.current = null;
+        target(e).releasePointerCapture?.(e.pointerId);
+        setHeld(false);
+        play("paper");
+        // let the page-level swipe handler see the flag before clearing it
+        setTimeout(() => (deskDrag.active = false), 0);
+      }}
+    >
+      {children}
+    </group>
   );
 }
 
@@ -138,15 +212,15 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
 
       {wide && (
         <>
-          <group position={[-3.05, 0.04, 0.9]} rotation={[0, 0.5, 0]}>
+          <Movable reduced={reduced} position={[-3.05, 0.04, 0.9]} rotation={[0, 0.5, 0]}>
             <Pencil />
-          </group>
-          <group position={[2.95, 0.003, -1.25]} rotation={[0, -0.35, 0]}>
+          </Movable>
+          <Movable reduced={reduced} position={[2.95, 0.003, -1.25]} rotation={[0, -0.35, 0]}>
             <Polaroid3D map={tex.photoB} />
-          </group>
-          <group position={[-2.9, 0.003, -1.1]} rotation={[0, 0.2, 0]}>
+          </Movable>
+          <Movable reduced={reduced} position={[-2.9, 0.003, -1.1]} rotation={[0, 0.2, 0]}>
             <StickyNote3D map={tex.sticky} size={0.75} />
-          </group>
+          </Movable>
           <group position={[2.85, 0.01, 1.2]} rotation={[0, 1.1, 0]}>
             <PaperClip3D />
           </group>
@@ -165,24 +239,24 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
           </group>
 
           {/* scrapbooking supplies */}
-          <group position={[-1.85, 0, 0.5]} rotation={[0, 0.3, 0]}>
+          <Movable reduced={reduced} position={[-1.85, 0, 0.5]} rotation={[0, 0.3, 0]}>
             <WashiRoll color="#FF755E" stripMap={tex.washi[0]} strip={0.55} />
-          </group>
-          <group position={[-2.2, 0, 0.0]} rotation={[0, -0.6, 0]}>
+          </Movable>
+          <Movable reduced={reduced} position={[-2.2, 0, 0.0]} rotation={[0, -0.6, 0]}>
             <WashiRoll color="#477BFF" stripMap={tex.washi[1]} />
-          </group>
-          <group position={[2.0, 0, 0.7]} rotation={[0, 2.6, 0]}>
+          </Movable>
+          <Movable reduced={reduced} position={[2.0, 0, 0.7]} rotation={[0, 2.6, 0]}>
             <WashiRoll color="#FFD84D" stripMap={tex.washi[2]} strip={0.4} />
-          </group>
-          <group position={[-1.75, 0, -0.8]} rotation={[0, 0.4, 0]}>
+          </Movable>
+          <Movable reduced={reduced} position={[-1.75, 0, -0.8]} rotation={[0, 0.4, 0]}>
             <Decal map={tex.decals[0]} size={0.34} />
-          </group>
+          </Movable>
           <group position={[2.15, 0, -0.15]} rotation={[0, -0.3, 0]}>
             <Decal map={tex.decals[1]} size={0.3} />
           </group>
-          <group position={[2.4, 0, -0.95]} rotation={[0, 0.2, 0]}>
+          <Movable reduced={reduced} position={[2.4, 0, -0.95]} rotation={[0, 0.2, 0]}>
             <Decal map={tex.decals[2]} size={0.28} />
-          </group>
+          </Movable>
           <group position={[-2.35, 0, -1.25]} rotation={[0, -0.25, 0]}>
             <Decal map={tex.decals[3]} size={0.46} />
           </group>
