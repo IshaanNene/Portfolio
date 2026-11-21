@@ -6,7 +6,6 @@ import { groupMeta, learningItems, type LearningGroup } from "@/data/learning";
 import { usePersistentState } from "@/hooks/usePersistentState";
 import { play } from "@/lib/sound";
 import { cn } from "@/lib/utils";
-import { SampleStamp } from "@/components/ui/Typography";
 
 const groups = Object.keys(groupMeta) as LearningGroup[];
 const tabColor: Record<LearningGroup, string> = { completed: "bg-grass", exploring: "bg-sun", future: "bg-[#a9c3ff]" };
@@ -173,7 +172,7 @@ export function Checklist() {
           </AnimatePresence>
 
           <div className="mt-10 flex items-center justify-between">
-            <SampleStamp label="sample goals" />
+            <span aria-hidden />
             <button
               onClick={() => setDone(Object.fromEntries(learningItems.map((i) => [i.id, i.done])))}
               className="font-mono text-[11px] uppercase underline decoration-dotted underline-offset-4"

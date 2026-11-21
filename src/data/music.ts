@@ -18,30 +18,31 @@ export type Album = {
 };
 
 export const albums: Album[] = [
-  { title: "Lateralus", artist: "Tool", year: "2001", cover: "", color: "#477BFF", note: "[PLACEHOLDER] why this one stuck with you" },
-  { title: "Madvillainy", artist: "Madvillain", year: "2004", cover: "", color: "#FF755E", note: "[PLACEHOLDER] favourite track + why" },
-  { title: "To Pimp a Butterfly", artist: "Kendrick Lamar", year: "2015", cover: "", color: "#9DDC8B", note: "[PLACEHOLDER] what it means to you" },
-  { title: "[Album]", artist: "[Artist]", year: "[YYYY]", cover: "", color: "#FFD84D", note: "[PLACEHOLDER] another favourite" },
-  { title: "[Album]", artist: "[Artist]", year: "[YYYY]", cover: "", color: "#B5835A", note: "[PLACEHOLDER] one more for the crate" },
+  { title: "Lateralus", artist: "Tool", year: "2001", cover: "", color: "#477BFF", note: "odd time signatures, and a title track built on the Fibonacci sequence." },
+  { title: "Madvillainy", artist: "Madvillain", year: "2004", cover: "", color: "#FF755E", note: "Madlib beats and DOOM verses: 22 tracks in 46 minutes." },
+  { title: "To Pimp a Butterfly", artist: "Kendrick Lamar", year: "2015", cover: "", color: "#9DDC8B", note: "jazz, funk and spoken word that only works front to back." },
 ];
 
-/** What's on the turntable. */
+/** The record on the platter — one from the crate above. */
 export const nowPlaying = {
-  track: "[Track]",
-  artist: "[Artist]",
-  album: "[Album]",
-  note: "[PLACEHOLDER] on repeat this week",
+  track: "Lateralus",
+  artist: "Tool",
+  album: "Lateralus (2001)",
+  note: "front to back. the only way to play it.",
 };
 
-/** Small "currently listening" list on a sticky note. */
-export const onRepeat: string[] = ["[Track] — [Artist]", "[Track] — [Artist]", "[Track] — [Artist]"];
+/** The sticky note next to the turntable. */
+export const onRepeat: string[] = ["Lateralus — Tool", "Madvillainy — Madvillain", "To Pimp a Butterfly — Kendrick Lamar"];
 
-/** The guitar corner. Photos: put files in public/images/guitar/ and set src. */
+/**
+ * The guitar corner. Photos: put files in public/images/guitar/ and set src.
+ * `learning` and `gear` stay hidden on the page until they're filled in.
+ */
 export const guitar = {
   photos: [
-    { src: "", caption: "me + guitar", back: "[PLACEHOLDER] a note about this photo" },
-    { src: "", caption: "practice corner", back: "[PLACEHOLDER] where you play" },
+    { src: "", caption: "me + guitar", back: "one of the best guitarists in college — says my own GitHub README." },
+    { src: "", caption: "practice corner", back: "where the chess engines get a break." },
   ],
-  learning: "[PLACEHOLDER] a song or technique you're learning",
-  gear: "[PLACEHOLDER] your guitar",
+  learning: "",
+  gear: "",
 };

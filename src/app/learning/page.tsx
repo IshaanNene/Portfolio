@@ -21,7 +21,7 @@ export default function LearningPage() {
         <GoldStarChart />
       </section>
       <Hand as="p" className="mx-auto mt-10 max-w-xl text-center text-ink-soft">
-        your ticks live only in your browser — the real list lives in <code className="font-mono text-sm">src/data/learning.ts</code>
+        your ticks live only in your browser. tick away.
       </Hand>
     </PageShell>
   );

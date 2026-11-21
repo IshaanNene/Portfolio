@@ -1,6 +1,6 @@
 /**
  * PASSPORT STAMPS — launches, hackathons, certifications & milestones.
- * All entries are PLACEHOLDERS — replace them with real ones.
+ * From my resume.
  */
 
 export type StampKind = "launch" | "hackathon" | "certification" | "milestone";
@@ -22,12 +22,12 @@ export const stampKinds: Record<StampKind, { label: string; color: string; shape
 };
 
 export const stamps: Stamp[] = [
-  { id: "s1", kind: "launch", title: "[Product launch]", place: "[Where]", date: "[MMM YYYY]", note: "[What launched and why it mattered]" },
-  { id: "s2", kind: "hackathon", title: "[Hackathon name]", place: "[City]", date: "[MMM YYYY]", note: "[What you built in 48h]" },
-  { id: "s3", kind: "certification", title: "[Certification]", place: "[Issuer]", date: "[YYYY]", note: "[What it covers]" },
-  { id: "s4", kind: "milestone", title: "[Milestone]", place: "[Context]", date: "[YYYY]", note: "[Why it counts]" },
-  { id: "s5", kind: "hackathon", title: "[Hackathon name]", place: "[Online]", date: "[MMM YYYY]", note: "[Result — only if real]" },
-  { id: "s6", kind: "launch", title: "[Open-source release]", place: "[GitHub]", date: "[MMM YYYY]", note: "[v1.0 of something]" },
-  { id: "s7", kind: "certification", title: "[Course / Cert]", place: "[Issuer]", date: "[YYYY]", note: "[Skill gained]" },
-  { id: "s8", kind: "milestone", title: "[Talk / article]", place: "[Venue]", date: "[YYYY]", note: "[Topic]" },
+  { id: "s1", kind: "hackathon", title: "Kaggle Data Analytics Hackathon", place: "PES University", date: "Nov 2024", note: "Second place — forecasting dynamic pricing on multi-year, multi-category time series." },
+  { id: "s2", kind: "milestone", title: "Joined IBM", place: "Bengaluru", date: "Jan 2026", note: "Software engineering intern on IBM Z tooling; full-time from June." },
+  { id: "s3", kind: "certification", title: "Terraform on IBM Cloud", place: "IBM", date: "2026", note: "Infrastructure as code on IBM Cloud." },
+  { id: "s4", kind: "milestone", title: "Graduated", place: "PES University", date: "Jun 2026", note: "B.Tech CSE, GPA 8.77, with CNR (2×) and DAC (4×) scholarships." },
+  { id: "s5", kind: "launch", title: "ScrapeGoat, open source", place: "GitHub", date: "2026", note: "Apache-2.0 crawler and MCP server: 541 tests, 16 merged pull requests." },
+  { id: "s6", kind: "certification", title: "Introduction to IBM z/OS", place: "IBM", date: "2026", note: "Plus z/OS Commands and Panels on IBM Z." },
+  { id: "s7", kind: "launch", title: "Meridian product site", place: "GitHub Pages", date: "Nov 2026", note: "Twelve Rust services; phases 0–7 built and verified." },
+  { id: "s8", kind: "certification", title: "Generative & Agentic AI Foundation", place: "IBM", date: "2026", note: "Alongside Cloud Essentials and Big Data Foundations." },
 ];

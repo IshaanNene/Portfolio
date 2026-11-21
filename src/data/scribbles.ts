@@ -1,7 +1,6 @@
 /**
  * SCRIBBLES — the handwritten page on /about.
- * SAMPLE thoughts so the page isn't blank. Replace with your own ideas,
- * observations and half-finished concepts.
+ * Lines lifted from my own notes and write-ups.
  */
 
 export type Scribble = {
@@ -12,10 +11,10 @@ export type Scribble = {
 };
 
 export const scribbles: Scribble[] = [
-  { id: "c1", kind: "idea", text: "[SAMPLE idea] a tool that turns my commit history into a diary entry", crossedOut: "a blog" },
-  { id: "c2", kind: "thought", text: "[SAMPLE thought] the best abstraction is the one you can delete later" },
-  { id: "c3", kind: "observation", text: "[SAMPLE] every bug I've loved was a timezone bug" },
-  { id: "c4", kind: "unfinished", text: "[SAMPLE] what if the cache was the database and the database was the…" },
-  { id: "c5", kind: "idea", text: "[SAMPLE idea] tiny multiplayer whiteboard over WebRTC" },
-  { id: "c6", kind: "thought", text: "[SAMPLE] readable > clever. (usually.)", crossedOut: "always" },
+  { id: "c1", kind: "idea", text: "a crawler that is a CLI, a library and an MCP server — in one binary", crossedOut: "three binaries" },
+  { id: "c2", kind: "thought", text: "measured, not claimed." },
+  { id: "c3", kind: "observation", text: "the query engines saturated before the services did" },
+  { id: "c4", kind: "unfinished", text: "if one seed can break Raft eighteen ways, what does it do to…" },
+  { id: "c5", kind: "idea", text: "run the CI checks before the push", crossedOut: "wait 20 minutes" },
+  { id: "c6", kind: "thought", text: "evidence before fixes.", crossedOut: "vibes" },
 ];

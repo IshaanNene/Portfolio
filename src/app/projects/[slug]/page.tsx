@@ -35,7 +35,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
   const idx = projects.findIndex((x) => x.slug === slug);
   const prev = projects[(idx - 1 + projects.length) % projects.length];
   const next = projects[(idx + 1) % projects.length];
-  const shots = p.screenshots?.length ? p.screenshots : [{ caption: "Screenshot" }];
+  const shots = (p.screenshots ?? []).filter((s) => s.src);
 
   return (
     <PageShell>
@@ -129,23 +129,23 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                   </ul>
                 </section>
 
+                {shots.length > 0 && (
                 <section aria-labelledby="shots">
                   <SectionHeading id="shots" note="taped in">Screenshots</SectionHeading>
                   <ul className="grid gap-8 sm:grid-cols-2">
                     {shots.map((s, i) => (
                       <li key={i} className="relative border-[3px] border-ink bg-paper p-2 pb-3 shadow-brutal" style={{ transform: `rotate(${tilt(i + 2, 2.5)}deg)` }}>
                         <Tape className="-top-3 left-6 -rotate-12" />
-                        {s.src ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={s.src} alt={s.caption} loading="lazy" className="aspect-[4/3] w-full border-2 border-ink object-cover" />
-                        ) : (
-                          <ProjectArt project={p} variant={i + 1} className="aspect-[4/3] w-full border-2 border-ink" label={`${s.caption} (placeholder)`} />
-                        )}
+                        <a href={s.src} target="_blank" rel="noreferrer" className="block" aria-label={`${s.caption} — open full size`}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={s.src} alt={`${p.name}: ${s.caption}`} loading="lazy" decoding="async" className="aspect-[16/10] w-full border-2 border-ink object-cover object-top" />
+                        </a>
                         <Hand className="mt-2 block text-xl">{s.caption}</Hand>
                       </li>
                     ))}
                   </ul>
                 </section>
+                )}
 
                 <section aria-labelledby="challenges">
                   <SectionHeading id="challenges" note="the bruises">Key engineering challenges</SectionHeading>

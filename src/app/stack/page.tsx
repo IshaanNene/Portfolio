@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { site } from "@/config/site";
 import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Hand, SampleStamp } from "@/components/ui/Typography";
+import { Hand } from "@/components/ui/Typography";
 import { FilingCabinet } from "@/components/stack/FilingCabinet";
 import { LabelTape } from "@/components/ui/Scrapbook";
 import { levelLabel } from "@/data/skills";
@@ -20,9 +20,8 @@ export default function StackPage() {
     <PageShell>
       <PageHeader page="07" kicker="records dept. · drawers A–D" title={<>The<br />stack.</>} note="filed, labelled, mostly alphabetised" />
       <div className="mb-10 flex flex-wrap items-center gap-3">
-        <SampleStamp label="sample list" />
         <Hand className="text-xl text-ink-soft">
-          a starter set of tools — trim it to the truth in <code className="font-mono text-sm">src/data/skills.ts</code>
+          every tool here is on my resume — each card says where I used it.
         </Hand>
       </div>
       <div className="-mt-4 mb-20 flex flex-wrap items-center gap-x-4 gap-y-6">

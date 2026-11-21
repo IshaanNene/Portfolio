@@ -45,11 +45,11 @@ export default function AboutPage() {
         <div className="relative mx-auto mt-10 flex max-w-xs justify-center gap-3">
           <div className="relative -rotate-6">
             <Washi pattern="dots" color="#FF755E" className="-top-3 left-6 -rotate-12 !w-16" />
-            <PhotoCard alt="a snapshot placeholder" caption="a good day" tint="#FFD84D" size="sm" back="swap in a real photo in app/about/page.tsx" />
+            <PhotoCard alt="a painted snapshot of PES University" caption="PES, '22–'26" tint="#FFD84D" size="sm" back="B.Tech CSE, GPA 8.77. most of the side projects on this site started here." />
           </div>
           <div className="relative mt-6 rotate-[5deg]">
             <Washi pattern="grid" color="#477BFF" className="-top-3 right-6 rotate-12 !w-16" />
-            <PhotoCard alt="another snapshot placeholder" caption="somewhere I like" tint="#a9c3ff" size="sm" back="ask me about this one." />
+            <PhotoCard alt="a painted snapshot of a hackathon" caption="Kaggle, Nov '24" tint="#a9c3ff" size="sm" back="second place: forecasting dynamic pricing across years of multi-category sales." />
           </div>
           <Doodle kind="bulb" className="absolute -bottom-6 -left-8 h-12 w-12" color="#FF755E" />
           <HandArrow className="absolute -right-14 -top-8 hidden rotate-[200deg] md:block" color="#477BFF" />

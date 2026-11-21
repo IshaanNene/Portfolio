@@ -3,7 +3,6 @@ import { site } from "@/config/site";
 import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Hand, SampleStamp } from "@/components/ui/Typography";
 import { Receipt } from "@/components/diary/Receipt";
 import { Passport } from "@/components/experience/Passport";
 import { LuggageTag, PostageStamp } from "@/components/ui/Scrapbook";
@@ -23,12 +22,6 @@ export default function ExperiencePage() {
   return (
     <PageShell>
       <PageHeader page="04" kicker="itemised · transaction log" color="bg-paper" title={<>Exp&shy;eri&shy;ence</>} note="keep the receipt — it's itemised" />
-      <div className="mb-8 flex flex-wrap items-center gap-3">
-        <SampleStamp label="placeholder entries" />
-        <Hand className="text-xl text-ink-soft">
-          replace in <code className="font-mono text-sm">src/data/experience.ts</code>
-        </Hand>
-      </div>
       <section aria-labelledby="receipt" className="relative">
         <h2 id="receipt" className="sr-only">Work history receipt</h2>
         {/* milestones clipped to the left of the receipt */}

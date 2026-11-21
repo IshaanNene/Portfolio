@@ -7,14 +7,12 @@ import { albums, guitar, nowPlaying, onRepeat, type Album } from "@/data/music";
 import { play } from "@/lib/sound";
 import { cn, tilt } from "@/lib/utils";
 import { Washi } from "@/components/ui/Scrapbook";
-import { SampleStamp } from "@/components/ui/Typography";
 import { PaperClip } from "@/components/ui/Decor";
 import { HandArrow, ScrapbookLabel, Staple, StickyPaper, TornPaper } from "@/components/scrapbook/pieces";
 import { HoverNote, PhotoCard, Sticker } from "@/components/scrapbook/interactive";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const clean = (s: string) => s.replace(/\[PLACEHOLDER\]\s*/g, "");
-const isPlaceholder = (s: string) => s.includes("[");
 
 /* ───────── vinyl ───────── */
 
@@ -92,11 +90,10 @@ export function Turntable() {
             {nowPlaying.artist.replace(/^\[|\]$/g, "")} · {nowPlaying.album.replace(/^\[|\]$/g, "")}
           </p>
           <p className="mt-2 font-hand text-xl leading-tight text-ink-soft">{clean(nowPlaying.note)}</p>
-          {isPlaceholder(nowPlaying.track) && <SampleStamp className="mt-3" label="edit src/data/music.ts" />}
         </div>
         <StickyPaper color="pink" rotate={-3} className="w-64">
           <Staple className="absolute -top-1 left-6" rotate={-6} />
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] opacity-70">currently listening</p>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] opacity-70">in the crate</p>
           <ol className="mt-2 space-y-1 font-hand text-xl font-bold leading-tight">
             {onRepeat.map((t, i) => (
               <li key={i}>
@@ -154,6 +151,15 @@ function Sleeve({ album, i }: { album: Album; i: number }) {
         </span>
       </button>
       <p className="mt-3 font-hand text-lg leading-tight text-ink-soft">{clean(album.note)}</p>
+      <a
+        href={`https://open.spotify.com/search/${encodeURIComponent(`${title} ${artist}`)}`}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`Listen to ${title} by ${artist} on Spotify (opens in a new tab)`}
+        className="mt-2 inline-flex items-center gap-1 border-2 border-ink bg-grass px-2 py-0.5 font-mono text-[10px] font-bold uppercase shadow-[2px_2px_0_#171717] transition-transform hover:-translate-y-0.5"
+      >
+        ▶ listen on Spotify ↗
+      </a>
     </li>
   );
 }
@@ -213,9 +219,11 @@ export function GuitarCorner() {
           <pre className="mt-4 overflow-x-auto font-mono text-[13px] leading-6 text-ink/85" aria-label="A scribbled guitar tab">
             {TAB.join("\n")}
           </pre>
-          <p className="mt-3 font-hand text-2xl font-bold leading-tight">
-            learning: <HoverNote note="slowly. very slowly.">{clean(guitar.learning)}</HoverNote>
-          </p>
+          {guitar.learning && (
+            <p className="mt-3 font-hand text-2xl font-bold leading-tight">
+              learning: <HoverNote note="slowly. very slowly.">{clean(guitar.learning)}</HoverNote>
+            </p>
+          )}
           <HandArrow className="absolute -bottom-6 right-4 rotate-[160deg]" color="#FF755E" />
         </div>
       </TornPaper>
@@ -231,9 +239,11 @@ export function GuitarCorner() {
             </text>
           </svg>
         </Sticker>
-        <ScrapbookLabel kind="index" n="the guitar" rotate={3}>
-          {clean(guitar.gear)}
-        </ScrapbookLabel>
+        {guitar.gear && (
+          <ScrapbookLabel kind="index" n="the guitar" rotate={3}>
+            {clean(guitar.gear)}
+          </ScrapbookLabel>
+        )}
       </div>
     </div>
   );

@@ -102,7 +102,7 @@ export default function NowPage() {
             Recent <HoverNote note="newest on top, oldest at the bottom.">updates</HoverNote>
           </SectionHeading>
           <Hand as="p" className="max-w-xs text-ink-soft">
-            the weekly log. newest on top. edit in <code className="font-mono text-sm">src/data/updates.ts</code>
+            the weekly log. newest on top.
           </Hand>
         </div>
         <ol className="relative border-l-[3px] border-dashed border-ink pl-6">
