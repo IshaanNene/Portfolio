@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookHeart, Menu, X } from "lucide-react";
+import { NotebookPen, Menu, X } from "lucide-react";
 import { colorClass, navItems } from "@/config/nav";
 import { site } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -56,7 +56,7 @@ export function BookmarkNavigation() {
           onMouseEnter={() => play("tick")}
           className="group flex items-center gap-2 border-[3px] border-ink bg-coral px-2.5 py-1.5 shadow-brutal transition-transform hover:-rotate-3 hover:scale-105"
         >
-          <BookHeart className="h-5 w-5 transition-transform group-hover:-rotate-12" strokeWidth={2.5} />
+          <NotebookPen className="h-5 w-5 transition-transform group-hover:-rotate-12" strokeWidth={2.5} />
           <span className="hidden font-display text-sm font-extrabold uppercase tracking-tight sm:inline">{site.firstName}&rsquo;s diary</span>
         </Link>
         <UtilityButtons />

@@ -258,3 +258,19 @@
   100% { transform: scale(1) rotate(-8deg); opacity: 0.9; }
 }
 .animate-stamp { animation: stamp-thump 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2) both; }
+
+/* DO NOT PRESS: a brief, harmless screen glitch */
+@keyframes glitch-shift {
+  0% { transform: translate(0); filter: none; }
+  20% { transform: translate(-4px, 1px); filter: hue-rotate(60deg) saturate(1.6); }
+  40% { transform: translate(3px, -2px); filter: invert(0.06); }
+  60% { transform: translate(-2px, 2px); filter: hue-rotate(-40deg); }
+  80% { transform: translate(2px, 0); filter: contrast(1.3); }
+  100% { transform: translate(0); filter: none; }
+}
+html.glitch body {
+  animation: glitch-shift 0.16s steps(2) 4;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.glitch body { animation: none; }
+}

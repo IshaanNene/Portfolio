@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "framer-motion";
 import { useFrame } from "@react-three/fiber";
 import { Edges, useCursor } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -224,9 +225,10 @@ function Ribbon({ x, len, yaw, color, drop }: { x: number; len: number; yaw: num
   const amp = useRef(0);
   const [over, setOver] = useState(false);
   useCursor(over);
+  const still = useReducedMotion();
   useFrame(({ clock }, dt) => {
     if (!g.current) return;
-    amp.current = Math.max(0, amp.current - Math.min(dt, 0.05) * 0.9);
+    amp.current = still ? 0 : Math.max(0, amp.current - Math.min(dt, 0.05) * 0.9);
     g.current.rotation.z = yaw + Math.sin(clock.elapsedTime * 13) * amp.current * 0.16;
   });
   return (

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { useCursor } from "@react-three/drei";
+import { Html, useCursor } from "@react-three/drei";
 import * as THREE from "three";
 import { deskDrag } from "@/lib/deskDrag";
 import { play } from "@/lib/sound";
@@ -53,19 +53,44 @@ const FLOOR = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
  * It lifts a little on hover, more while carried, and stays where it's dropped
  * (until the page reloads — desks get tidied).
  */
-function Movable({ position, rotation = [0, 0, 0], reduced, children }: { position: [number, number, number]; rotation?: [number, number, number]; reduced: boolean; children: React.ReactNode }) {
+function Movable({
+  position,
+  rotation = [0, 0, 0],
+  reduced,
+  drag = true,
+  sound = "pop",
+  children,
+}: {
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  reduced: boolean;
+  /** false = it only lifts and pops (things tucked under the diary stay put) */
+  drag?: boolean;
+  sound?: "pop" | "paper" | "tick";
+  children: React.ReactNode;
+}) {
   const g = useRef<THREE.Group>(null);
   const off = useRef<THREE.Vector3 | null>(null);
+  const down = useRef<{ x: number; y: number } | null>(null);
   const hit = useMemo(() => new THREE.Vector3(), []);
   const lift = useRef(0);
+  const turn = useRef(0);
+  const pop = useRef(0);
   const [hover, setHover] = useState(false);
   const [held, setHeld] = useState(false);
-  useCursor(hover || held, held ? "grabbing" : "grab");
-  useFrame((_, dt) => {
+  useCursor(hover || held, drag ? (held ? "grabbing" : "grab") : "pointer");
+  useFrame(({ clock }, dt) => {
     if (!g.current) return;
+    const d = Math.min(dt, 0.05);
     const target = held ? 0.07 : hover ? 0.018 : 0;
-    lift.current = reduced ? target : THREE.MathUtils.damp(lift.current, target, 12, Math.min(dt, 0.05));
-    g.current.position.y = position[1] + lift.current;
+    lift.current = reduced ? target : THREE.MathUtils.damp(lift.current, target, 12, d);
+    turn.current = reduced ? 0 : THREE.MathUtils.damp(turn.current, hover && !held ? 1 : 0, 8, d);
+    pop.current = Math.max(0, pop.current - d * 2.4);
+    const p = reduced ? 0 : pop.current;
+    g.current.position.y = position[1] + lift.current + Math.sin(p * Math.PI) * 0.05;
+    // springy click response + a small turn on hover
+    g.current.scale.setScalar(1 + Math.sin(p * Math.PI) * 0.18);
+    g.current.rotation.y = rotation[1] + turn.current * 0.08 + Math.sin(clock.elapsedTime * 24) * p * 0.25;
   });
   const local = (e: ThreeEvent<PointerEvent>) => {
     if (!g.current?.parent || !e.ray.intersectPlane(FLOOR, hit)) return null;
@@ -84,13 +109,14 @@ function Movable({ position, rotation = [0, 0, 0], reduced, children }: { positi
       onPointerOut={() => setHover(false)}
       onPointerDown={(e) => {
         e.stopPropagation();
+        down.current = { x: e.clientX, y: e.clientY };
+        if (!drag) return;
         const p = local(e);
         if (!p || !g.current) return;
         off.current = new THREE.Vector3(g.current.position.x - p.x, 0, g.current.position.z - p.z);
         deskDrag.active = true;
         target(e).setPointerCapture?.(e.pointerId);
         setHeld(true);
-        play("tick");
       }}
       onPointerMove={(e) => {
         if (!off.current || !g.current) return;
@@ -101,17 +127,59 @@ function Movable({ position, rotation = [0, 0, 0], reduced, children }: { positi
         g.current.position.z = THREE.MathUtils.clamp(p.z + off.current.z, -2.4, 2.5);
       }}
       onPointerUp={(e) => {
-        if (!off.current) return;
+        const start = down.current;
+        down.current = null;
+        if (!start) return;
         e.stopPropagation();
+        const tap = Math.hypot(e.clientX - start.x, e.clientY - start.y) < 5;
+        if (tap) {
+          pop.current = 1;
+          play(sound);
+        } else play("paper");
+        if (!off.current) return;
         off.current = null;
         target(e).releasePointerCapture?.(e.pointerId);
         setHeld(false);
-        play("paper");
         // let the page-level swipe handler see the flag before clearing it
         setTimeout(() => (deskDrag.active = false), 0);
       }}
     >
       {children}
+    </group>
+  );
+}
+
+/**
+ * Something on the desk with more to say: hover (or tap) and a taped slip
+ * appears with the context behind it.
+ */
+function Reveal({ position, rotation = [0, 0, 0], note, children }: { position: [number, number, number]; rotation?: [number, number, number]; note: string; children: React.ReactNode }) {
+  const [on, setOn] = useState(false);
+  useCursor(on, "help");
+  return (
+    <group
+      position={position}
+      rotation={rotation}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setOn(true);
+      }}
+      onPointerOut={() => setOn(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setOn((v) => !v);
+        play("paper");
+      }}
+    >
+      {children}
+      {on && (
+        <Html position={[0, 0.08, -0.25]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          <div className="relative w-56 -rotate-2 border-2 border-ink bg-paper px-3 pb-2 pt-3 shadow-brutal">
+            <span className="absolute -top-2.5 left-1/2 h-4 w-14 -translate-x-1/2 rotate-3 bg-sun/80" />
+            <p className="font-hand text-lg font-bold leading-tight text-ink">{note}</p>
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -194,21 +262,21 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
       <group position={[0.12, 0.0015, -0.08]} rotation={[0, 0.1, 0]}>
         <Sheet map={tex.sheets[0]} w={2.15} h={2.69} curl={0.03} seed={1} />
       </group>
-      <group position={[-0.62, 0.0028, -0.55]} rotation={[0, -0.22, 0]}>
+      <Reveal position={[-0.62, 0.0028, -0.55]} rotation={[0, -0.22, 0]} note="napkin sketch of Meridian: API → Kafka → Rust workers → Postgres. the arrows took three tries.">
         <Sheet map={tex.graph} w={0.9} h={1.12} curl={0.06} seed={4} />
-      </group>
+      </Reveal>
       <group position={[-0.7, 0.0035, 0.45]} rotation={[0, 0.38, 0]}>
         <Sheet map={tex.sheets[1]} w={1.2} h={1.5} curl={0.07} seed={2} />
       </group>
       <group position={[0.7, 0.003, 0.95]} rotation={[0, -0.6, 0]}>
         <Sheet map={tex.sheets[2]} w={0.7} h={0.88} curl={0.04} seed={3} />
       </group>
-      <group position={[0.92, 0.002, -0.92]} rotation={[0, -0.45, 0]}>
+      <Movable reduced={reduced} drag={false} sound="paper" position={[0.92, 0.002, -0.92]} rotation={[0, -0.45, 0]}>
         <Polaroid3D map={tex.photoC} size={0.62} />
-      </group>
-      <group position={[-0.95, 0.002, -0.75]} rotation={[0, 0.55, 0]}>
+      </Movable>
+      <Movable reduced={reduced} drag={false} sound="paper" position={[-0.95, 0.002, -0.75]} rotation={[0, 0.55, 0]}>
         <Polaroid3D map={tex.photoA} size={0.55} />
-      </group>
+      </Movable>
 
       {wide && (
         <>
@@ -225,18 +293,20 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
             <PaperClip3D />
           </group>
           {/* foreground: handwriting added later, pointing at things */}
-          <group position={[-2.55, 0, 1.55]} rotation={[0, 0.08, 0]}>
+          <Reveal position={[-2.55, 0, 1.55]} rotation={[0, 0.08, 0]} note="…famous last words. every project since has shipped with a Dockerfile.">
             <InkNote map={tex.notes[0]} />
-          </group>
-          <group position={[1.36, 0, 0.5]} rotation={[0, 0.06, 0]}>
+          </Reveal>
+          <Reveal position={[1.36, 0, 0.5]} rotation={[0, 0.06, 0]} note="it is never just one. the Lab page is where they end up.">
             <InkNote map={tex.notes[1]} w={0.62} />
-          </group>
-          <group position={[-1.5, 0, 1.18]} rotation={[0, 0.05, 0]}>
+          </Reveal>
+          <Reveal position={[-1.5, 0, 1.18]} rotation={[0, 0.05, 0]} note="shipped so far: Meridian, DebugAssist, a chess engine and three more. see Projects.">
             <InkNote map={tex.notes[2]} w={0.8} />
-          </group>
-          <group position={[-3.4, 0, 2.1]} scale={1.4}>
-            <Mug reduced={reduced} />
-          </group>
+          </Reveal>
+          <Reveal position={[-3.4, 0, 2.1]} note="coffee #4. it is 1:47am. the bug was a missing semicolon.">
+            <group scale={1.4}>
+              <Mug reduced={reduced} />
+            </group>
+          </Reveal>
 
           {/* scrapbooking supplies */}
           <Movable reduced={reduced} position={[-1.85, 0, 0.5]} rotation={[0, 0.3, 0]}>
@@ -251,18 +321,18 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
           <Movable reduced={reduced} position={[-1.75, 0, -0.8]} rotation={[0, 0.4, 0]}>
             <Decal map={tex.decals[0]} size={0.34} />
           </Movable>
-          <group position={[2.15, 0, -0.15]} rotation={[0, -0.3, 0]}>
+          <Movable reduced={reduced} position={[2.15, 0, -0.15]} rotation={[0, -0.3, 0]}>
             <Decal map={tex.decals[1]} size={0.3} />
-          </group>
+          </Movable>
           <Movable reduced={reduced} position={[2.4, 0, -0.95]} rotation={[0, 0.2, 0]}>
             <Decal map={tex.decals[2]} size={0.28} />
           </Movable>
-          <group position={[-2.35, 0, -1.25]} rotation={[0, -0.25, 0]}>
+          <Movable reduced={reduced} position={[-2.35, 0, -1.25]} rotation={[0, -0.25, 0]}>
             <Decal map={tex.decals[3]} size={0.46} />
-          </group>
-          <group position={[1.95, 0, 1.6]} rotation={[0, 0.5, 0]}>
+          </Movable>
+          <Movable reduced={reduced} position={[1.95, 0, 1.6]} rotation={[0, 0.5, 0]}>
             <Decal map={tex.decals[4]} size={0.26} />
-          </group>
+          </Movable>
         </>
       )}
     </group>

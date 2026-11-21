@@ -8,7 +8,7 @@
 import { useSyncExternalStore } from "react";
 import { safeStorage } from "./utils";
 
-type SoundName = "tick" | "paper" | "thunk" | "stamp" | "key" | "pop" | "rip";
+type SoundName = "tick" | "paper" | "thunk" | "stamp" | "key" | "pop" | "rip" | "open" | "glitch";
 
 const KEY = "diary:sound";
 let enabled = false;
@@ -104,6 +104,16 @@ export function play(name: SoundName) {
       break;
     case "pop":
       tone(a, 520, 0.12, 0.12, "sine", 980);
+      break;
+    case "open":
+      // board creak + the first pages fanning
+      tone(a, 120, 0.25, 0.12, "triangle", 70);
+      noiseBurst(a, 0.35, 1600, 0.22, 0.6);
+      break;
+    case "glitch":
+      tone(a, 880, 0.08, 0.05, "square", 220);
+      setTimeout(() => tone(a, 440, 0.08, 0.05, "sawtooth", 1320), 90);
+      setTimeout(() => noiseBurst(a, 0.12, 4000, 0.12, 3), 180);
       break;
   }
 }

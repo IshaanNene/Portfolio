@@ -67,9 +67,13 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
       pivot.current.position.z = hingeZ + Math.sin(p * Math.PI) * 0.03;
     }
     if (stickerRef.current && spin.current > 0) {
-      spin.current = Math.max(0, spin.current - dt * 2.2);
-      stickerRef.current.rotation.z = Math.sin(spin.current * 18) * spin.current * 0.6;
-      stickerRef.current.scale.setScalar(1 + spin.current * 0.25);
+      // pressed in, then springs back with a little wobble
+      spin.current = Math.max(0, spin.current - dt * 1.8);
+      const s = spin.current;
+      const press = s > 0.82 ? (1 - s) / 0.18 : s / 0.82;
+      stickerRef.current.scale.set(1 - press * 0.12, 1 - press * 0.12, 1);
+      stickerRef.current.position.z = thickness / 2 + 0.005 - press * 0.006;
+      stickerRef.current.rotation.z = 0.2 + Math.sin(s * 22) * s * 0.18;
     }
   });
 

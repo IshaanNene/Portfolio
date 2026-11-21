@@ -17,6 +17,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Hand, ScribbleArrow } from "@/components/ui/Typography";
 import { DiaryFallback } from "./DiaryFallback";
 import { StatusPill } from "./StatusPill";
+import { PressedPrank } from "./PressedPrank";
 
 const HomeScene = dynamic(() => import("@/components/3d/HomeScene"), { ssr: false });
 
@@ -43,6 +44,7 @@ export function HomeExperience() {
   const [failed, setFailed] = useState(false);
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const [idleNote, setIdleNote] = useState<number | null>(null);
+  const [pressed, setPressed] = useState(0);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -53,7 +55,7 @@ export function HomeExperience() {
   }, []);
 
   const next = useCallback(() => {
-    play("paper");
+    play(spread === 0 ? "open" : "paper");
     if (!narrow) return setSpread((k) => Math.min(MAX, k + 1));
     if (spread === 0) {
       setSpread(1);
@@ -90,6 +92,36 @@ export function HomeExperience() {
   }, [next, prev]);
 
   const use3D = tier !== null && tier !== "none" && !failed;
+
+  // keep the open spread in the URL (#page-N) so back/forward step through the diary
+  // hashRead: don't write the URL until the initial #page-N has been read, or a deep link gets wiped
+  const hashRead = useRef(false);
+  useEffect(() => {
+    if (!hashRead.current) return;
+    const ours = location.hash === "" || /^#page-\d+$/.test(location.hash);
+    const want = spread === 0 ? "" : `#page-${spread}`;
+    if (!ours || location.hash === want) return;
+    history.pushState(history.state, "", want || location.pathname + location.search);
+  }, [spread]);
+  useEffect(() => {
+    const read = () => {
+      hashRead.current = true;
+      const h = location.hash;
+      if (h !== "" && !/^#page-\d+$/.test(h)) return; // e.g. #index — not a diary page
+      const k = h ? Math.max(0, Math.min(MAX, Number(h.slice(6)) || 0)) : 0;
+      setSpread((cur) => {
+        if (cur !== k) play(k === 0 ? "thunk" : "paper");
+        return k;
+      });
+      setSide("left");
+    };
+    const t = window.setTimeout(read, 0);
+    window.addEventListener("popstate", read);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("popstate", read);
+    };
+  }, []);
 
   // occasional handwritten aside after ~14s of no input; any input tucks it away again
   useEffect(() => {
@@ -162,7 +194,9 @@ export function HomeExperience() {
               }}
               onSticker={() => {
                 play("thunk");
+                setTimeout(() => play("glitch"), 250);
                 findEgg("donotpress");
+                setPressed((n) => n + 1);
               }}
               onJump={(k, s) => {
                 play("paper");
@@ -204,20 +238,25 @@ export function HomeExperience() {
 
       {/* overlay UI */}
       <div className="pointer-events-none absolute inset-0">
-        <div className={cn("pointer-events-auto absolute right-4 top-16 transition-opacity sm:top-5 md:right-28", narrow && spread > 0 && "pointer-events-none opacity-0")}>
+        <div className="pointer-events-auto absolute right-4 top-16 sm:top-5 md:right-28">
           <StatusPill />
         </div>
 
         {use3D && ready && spread === 0 && (
-          <motion.div
+          <motion.button
+            type="button"
+            onClick={next}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="absolute left-[8%] top-[24%] hidden -rotate-6 text-coral lg:block"
+            whileHover={reduced ? undefined : { rotate: -3, scale: 1.04 }}
+            whileTap={reduced ? undefined : { scale: 0.96 }}
+            transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0 }}
+            className="pointer-events-auto absolute left-[8%] top-[24%] hidden -rotate-6 text-left text-coral lg:block"
+            aria-label="Open the diary"
           >
-            <Hand className="block text-3xl text-cream">click to open me!</Hand>
+            <Hand className="block text-3xl text-cream underline decoration-sun/0 decoration-4 underline-offset-4 transition-colors hover:decoration-sun">click to open me!</Hand>
             <ScribbleArrow className="ml-24 mt-1 h-14 w-28 rotate-[30deg]" />
-          </motion.div>
+          </motion.button>
         )}
         <AnimatePresence>
           {use3D && ready && idleNote !== null && (
@@ -239,8 +278,11 @@ export function HomeExperience() {
         </AnimatePresence>
 
         {use3D && ready && spread === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="absolute bottom-[14%] right-[6%] hidden max-w-[11rem] rotate-3 xl:block">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="group pointer-events-auto absolute bottom-[14%] right-[6%] hidden max-w-[12rem] rotate-3 xl:block">
             <Hand className="text-2xl text-cream/80">psst — don&rsquo;t press the red sticker</Hand>
+            <Hand className="block max-h-0 overflow-hidden text-lg text-sun opacity-0 transition-all duration-300 group-hover:max-h-16 group-hover:opacity-100">
+              (seriously. it&rsquo;s load-bearing.)
+            </Hand>
           </motion.div>
         )}
 
@@ -254,7 +296,7 @@ export function HomeExperience() {
               ))}
             </div>
             {/* page turner: a taped kraft strip with chunky keys */}
-            <div className="relative flex -rotate-1 items-center gap-3 border-[3px] border-ink bg-kraft px-3 py-2 shadow-brutal">
+            <div className="relative flex max-w-full -rotate-1 items-center gap-2 border-[3px] border-ink bg-kraft px-2 py-2 shadow-brutal sm:gap-3 sm:px-3">
               <span aria-hidden className="tape -top-3 left-1/2 w-16 -translate-x-1/2 rotate-3" />
               <button
                 onClick={prev}
@@ -264,21 +306,31 @@ export function HomeExperience() {
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <div className="flex items-end gap-1" aria-hidden>
+              <div className="flex h-7 items-end gap-1">
                 {Array.from({ length: SPREAD_COUNT }).map((_, i) => (
-                  <span
+                  <button
                     key={i}
+                    type="button"
+                    onClick={() => {
+                      if (i === spread) return;
+                      play(i === 0 ? "thunk" : spread === 0 ? "open" : "paper");
+                      setSpread(i);
+                      setSide("left");
+                    }}
+                    aria-label={i === 0 ? "Close the diary" : `Go to page ${i}`}
+                    aria-current={i === spread ? "page" : undefined}
                     className={cn(
-                      "grid w-5 place-items-center border-2 border-ink font-mono text-[8px] font-bold transition-all",
-                      i === spread ? "h-6 bg-coral" : "h-4 bg-paper/90",
+                      "grid w-4 place-items-center border-2 border-ink font-mono sm:w-5 text-[8px] font-bold transition-all hover:-translate-y-0.5",
+                      i === spread ? "h-7 bg-coral" : "h-4 bg-paper/90 hover:h-5 hover:bg-sun",
                     )}
                   >
-                    {i === spread ? i + 1 : ""}
-                  </span>
+                    {i === spread ? (i === 0 ? "★" : i) : ""}
+                  </button>
                 ))}
               </div>
-              <span className="sr-only" aria-live="polite">
-                {spread === 0 ? "Diary closed" : `Spread ${spread} of ${MAX}`}
+              <span className="min-w-[3.75rem] text-center font-mono sm:min-w-[4.5rem] text-[11px] font-bold uppercase leading-tight" aria-live="polite">
+                {spread === 0 ? "cover" : `page ${spread}`}
+                <span className="block text-[9px] opacity-70">{spread === 0 ? "closed" : `of ${MAX}`}</span>
               </span>
               <button
                 onClick={next}
@@ -291,6 +343,8 @@ export function HomeExperience() {
             </div>
           </div>
         )}
+
+        <PressedPrank count={pressed} reduced={reduced} />
 
         {/* scroll indicator */}
         <a
