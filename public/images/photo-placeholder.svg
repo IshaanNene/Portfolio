@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <defs>
+    <pattern id="d" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2.6" fill="#171717" opacity=".12"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="1000" fill="#9DDC8B"/>
+  <rect width="800" height="1000" fill="url(#d)"/>
+  <circle cx="400" cy="380" r="150" fill="#F5EBD8" stroke="#171717" stroke-width="14"/>
+  <path d="M150 1000 C 170 720, 290 620, 400 620 C 510 620, 630 720, 650 1000 Z" fill="#477BFF" stroke="#171717" stroke-width="14"/>
+  <path d="M330 360 q 18 -22 36 0 M434 360 q 18 -22 36 0" fill="none" stroke="#171717" stroke-width="12" stroke-linecap="round"/>
+  <path d="M345 440 q 55 50 110 0" fill="none" stroke="#171717" stroke-width="12" stroke-linecap="round"/>
+  <path d="M258 290 C 290 190, 520 180, 548 300 C 500 250, 330 250, 258 290 Z" fill="#171717"/>
+  <rect x="160" y="70" width="480" height="96" fill="#FFD84D" stroke="#171717" stroke-width="10" transform="rotate(-4 400 118)"/>
+  <text x="400" y="135" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="46" fill="#171717" transform="rotate(-4 400 118)">YOUR PHOTO</text>
+  <text x="400" y="930" text-anchor="middle" font-family="monospace" font-size="30" fill="#fff">public/images/your-photo.jpg</text>
+</svg>
