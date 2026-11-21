@@ -63,8 +63,8 @@ export function BookmarkNavigation() {
       </div>
 
       {/* ── Desktop bookmark ribbons: every label stays fully inside the viewport ── */}
-      <nav aria-label="Diary chapters" className="pointer-events-none fixed right-0 top-1/2 z-40 hidden -translate-y-1/2 md:block">
-        <ul className="no-scrollbar flex max-h-[94vh] flex-col items-end gap-1 overflow-y-auto overflow-x-hidden py-2 pl-3">
+      <nav aria-label="Diary chapters" className="pointer-events-none fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 md:block lg:right-5">
+        <ul className="no-scrollbar flex max-h-[94vh] flex-col items-end gap-1 overflow-y-auto overflow-x-hidden py-2 pl-3 pr-2">
           {navItems.map((item, i) => {
             const active = isActive(pathname, item.href);
             return (
@@ -75,7 +75,7 @@ export function BookmarkNavigation() {
                   aria-label={`${item.label} (page ${item.page})`}
                   onMouseEnter={() => play("tick")}
                   className={cn(
-                    "group pointer-events-auto relative flex h-10 items-center gap-2 border-[3px] border-r-0 border-ink pl-5 pr-2 font-display text-[13px] font-extrabold uppercase tracking-tight transition-[width,box-shadow] duration-300 ease-[var(--ease-paper)] [@media(max-height:640px)]:h-8",
+                    "group pointer-events-auto relative flex h-10 items-center gap-2 border-[3px] border-ink pl-5 pr-2 font-display text-[13px] font-extrabold uppercase tracking-tight transition-[width,box-shadow] duration-300 ease-[var(--ease-paper)] [@media(max-height:640px)]:h-8",
                     colorClass[item.color],
                     active ? "w-16 shadow-[-5px_5px_0_#171717] hover:w-44 focus-visible:w-44 min-[1440px]:w-44" : "w-12 shadow-[-2px_3px_0_#171717] hover:w-40 focus-visible:w-40 min-[1440px]:w-36",
                   )}

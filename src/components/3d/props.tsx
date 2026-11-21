@@ -11,7 +11,7 @@ import * as THREE from "three";
 
 const INK = "#171717";
 
-export function Mug({ color = "#3E5C76", steam = true, reduced = false }: { color?: string; steam?: boolean; reduced?: boolean }) {
+export function Mug({ color = "#477BFF", steam = true, reduced = false }: { color?: string; steam?: boolean; reduced?: boolean }) {
   const profile = useMemo(() => {
     const pts: THREE.Vector2[] = [];
     pts.push(new THREE.Vector2(0, 0));
@@ -51,7 +51,7 @@ export function Mug({ color = "#3E5C76", steam = true, reduced = false }: { colo
       </mesh>
       <mesh position={[0, 0.2, 0.223]} rotation={[0, 0, 0]}>
         <planeGeometry args={[0.16, 0.12]} />
-        <meshStandardMaterial color="#D9A441" roughness={0.6} />
+        <meshStandardMaterial color="#FFD84D" roughness={0.6} />
       </mesh>
       {steam &&
         [0, 1, 2].map((i) => (
@@ -64,7 +64,7 @@ export function Mug({ color = "#3E5C76", steam = true, reduced = false }: { colo
   );
 }
 
-export function Pencil({ color = "#D9A441", length = 1.1 }: { color?: string; length?: number }) {
+export function Pencil({ color = "#FFD84D", length = 1.1 }: { color?: string; length?: number }) {
   return (
     <group rotation={[0, 0, Math.PI / 2]}>
       <mesh castShadow>
@@ -85,7 +85,7 @@ export function Pencil({ color = "#D9A441", length = 1.1 }: { color?: string; le
       </mesh>
       <mesh position={[0, -length / 2 - 0.09, 0]} castShadow>
         <cylinderGeometry args={[0.034, 0.034, 0.07, 12]} />
-        <meshStandardMaterial color="#D2693A" roughness={0.9} />
+        <meshStandardMaterial color="#FF755E" roughness={0.9} />
       </mesh>
     </group>
   );
@@ -131,7 +131,7 @@ export function StickyNote3D({ map, size = 0.5 }: { map: THREE.Texture; size?: n
   );
 }
 
-export function Headphones({ color = "#D2693A" }: { color?: string }) {
+export function Headphones({ color = "#FF755E" }: { color?: string }) {
   return (
     <group>
       <mesh castShadow rotation={[0, 0, 0]}>
@@ -154,7 +154,7 @@ export function Headphones({ color = "#D2693A" }: { color?: string }) {
   );
 }
 
-export function Notebook({ cover, label, color = "#D9A441" }: { cover?: THREE.Texture; label?: THREE.Texture; color?: string }) {
+export function Notebook({ cover, label, color = "#FFD84D" }: { cover?: THREE.Texture; label?: THREE.Texture; color?: string }) {
   const w = 1.0;
   const h = 1.35;
   return (
@@ -191,16 +191,16 @@ export function Notebook({ cover, label, color = "#D9A441" }: { cover?: THREE.Te
 
 export function PenCup() {
   const pens: { c: string; r: [number, number, number]; h: number }[] = [
-    { c: "#3E5C76", r: [0.12, 0, 0.1], h: 0.95 },
-    { c: "#D2693A", r: [-0.1, 0, -0.08], h: 0.9 },
+    { c: "#477BFF", r: [0.12, 0, 0.1], h: 0.95 },
+    { c: "#FF755E", r: [-0.1, 0, -0.08], h: 0.9 },
     { c: "#171717", r: [0.05, 0, -0.15], h: 1.0 },
-    { c: "#8FA05A", r: [-0.14, 0, 0.12], h: 0.85 },
+    { c: "#9DDC8B", r: [-0.14, 0, 0.12], h: 0.85 },
   ];
   return (
     <group>
       <mesh castShadow receiveShadow position={[0, 0.3, 0]}>
         <cylinderGeometry args={[0.2, 0.18, 0.6, 24, 1, true]} />
-        <meshStandardMaterial color="#D9A441" roughness={0.6} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#FFD84D" roughness={0.6} side={THREE.DoubleSide} />
       </mesh>
       <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.18, 24]} />
@@ -227,7 +227,7 @@ export function Plant() {
     <group>
       <mesh castShadow receiveShadow position={[0, 0.17, 0]}>
         <cylinderGeometry args={[0.2, 0.15, 0.34, 20]} />
-        <meshStandardMaterial color="#D2693A" roughness={0.8} />
+        <meshStandardMaterial color="#FF755E" roughness={0.8} />
       </mesh>
       <mesh position={[0, 0.335, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.19, 20]} />
@@ -247,7 +247,7 @@ export function Plant() {
       </mesh>
       <mesh position={[0, 0.92, 0]}>
         <sphereGeometry args={[0.05, 10, 10]} />
-        <meshStandardMaterial color="#D9A441" />
+        <meshStandardMaterial color="#FFD84D" />
       </mesh>
     </group>
   );

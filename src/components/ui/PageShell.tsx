@@ -12,7 +12,7 @@ export function PageShell({ children, className, wide = false }: { children: Rea
       <div aria-hidden className="pointer-events-none absolute inset-y-0 -left-44 hidden w-40 2xl:block">
         <TornPaper seed={41} color="#B5835A" rotate={-8} className="absolute top-[30rem] h-28 w-32 opacity-80" />
         <TornPaper seed={42} color="#FBF5E8" rotate={6} ruled className="absolute top-[58rem] h-40 w-36" />
-        <Washi pattern="dots" color="#3E5C76" className="top-[57.5rem] left-10 rotate-12" />
+        <Washi pattern="dots" color="#477BFF" className="top-[57.5rem] left-10 rotate-12" />
         <TornPaper seed={43} color="#A9C9FF" rotate={-3} className="absolute top-[90rem] h-24 w-28 opacity-80" />
       </div>
       {children}

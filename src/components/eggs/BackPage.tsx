@@ -52,14 +52,14 @@ export function BackPage() {
           <label htmlFor="shift" className="mt-4 block font-hand text-xl font-bold">
             turn the decoder ring: {key}
           </label>
-          <input id="shift" type="range" min={0} max={25} value={key} onChange={(e) => setKey(Number(e.target.value))} className="w-full accent-[#3E5C76]" />
+          <input id="shift" type="range" min={0} max={25} value={key} onChange={(e) => setKey(Number(e.target.value))} className="w-full accent-[#477BFF]" />
           <p className={cn("mt-3 break-words font-hand text-2xl font-bold leading-tight", solved ? "text-[#2f8a3a]" : "text-ink-soft")} aria-live="polite">
             {attempt}
           </p>
           {solved && <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.2em]">decoded. you&rsquo;d make a good debugger.</p>}
         </PaperCard>
 
-        <PaperCard rotate={-2} className="bg-[#EFE3C0]">
+        <PaperCard rotate={-2} className="bg-[#FFF4B8]">
           <p className="font-hand text-2xl font-bold leading-tight">
             secret note: this whole diary — the pages, the cover, the desk — is drawn with code at runtime. no images were harmed (except the photo).
           </p>

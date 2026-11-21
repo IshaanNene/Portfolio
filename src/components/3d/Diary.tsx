@@ -106,8 +106,8 @@ async function buildTextures(scale: number): Promise<Textures> {
     leatherMaps: await loadLeatherMaps(),
     sticker: paintDoNotPress(f),
     flags: chapterTabs.map((t) => paintFlag(f, t.page, t.title, t.color === "#FFFFFF" ? "#F5EBD8" : t.color)),
-    ticket: paintTicket(f, "#D9A441", "Hackathon", 6),
-    photo: paintPhoto(f, "#8FA05A", "summer '2X", 13),
+    ticket: paintTicket(f, "#FFD84D", "Hackathon", 6),
+    photo: paintPhoto(f, "#9DDC8B", "summer '2X", 13),
     note: paintNote(f, "don't forget: drink water, push code"),
     layers,
   };
@@ -346,7 +346,7 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
       {[1, -1].map((sgn) => (
         <mesh key={sgn} position={[0.012, sgn * (PAGE_HEIGHT / 2 + 0.004), -BOOK.T / 2 + blockDepth / 2]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.014, 0.014, blockDepth, 10]} />
-          <meshStandardMaterial color={sgn > 0 ? "#b8863f" : "#6e2d1f"} roughness={0.6} />
+          <meshStandardMaterial color={sgn > 0 ? "#FFD84D" : "#477BFF"} roughness={0.6} />
         </mesh>
       ))}
 
@@ -421,9 +421,9 @@ export function Diary({ spread, quality, reduced, onNext, onPrev, onLink, onStic
       </group>
 
       {/* three satin ribbon bookmarks fanning out of the bottom */}
-      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.42} len={0.34} yaw={-0.32} color="#2f4a3a" drop={BOOK.T / 2 + BOOK.coverT - 0.03} />
-      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.55} len={0.46} yaw={0.04} color="#7a2e24" drop={BOOK.T / 2 + BOOK.coverT - 0.028} />
-      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.68} len={0.3} yaw={0.36} color="#c9a25a" drop={BOOK.T / 2 + BOOK.coverT - 0.026} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.42} len={0.34} yaw={-0.32} color="#477BFF" drop={BOOK.T / 2 + BOOK.coverT - 0.03} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.55} len={0.46} yaw={0.04} color="#FF755E" drop={BOOK.T / 2 + BOOK.coverT - 0.028} />
+      <Ribbon x={PAGE_X + PAGE_WIDTH * 0.68} len={0.3} yaw={0.36} color="#FFD84D" drop={BOOK.T / 2 + BOOK.coverT - 0.026} />
 
       {/* chapter index flags stuck along the fore-edge */}
       {chapterTabs.map((t, i) => {

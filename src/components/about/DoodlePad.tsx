@@ -5,7 +5,7 @@ import { Eraser, Pencil, Trash2 } from "lucide-react";
 import { findEgg } from "@/lib/eggs";
 import { cn } from "@/lib/utils";
 
-const INKS = ["#171717", "#3E5C76", "#D2693A", "#2f8a3a"];
+const INKS = ["#171717", "#477BFF", "#FF755E", "#2f8a3a"];
 
 /** A little canvas in the margin. Visitors can leave a doodle (kept locally). */
 export function DoodlePad() {

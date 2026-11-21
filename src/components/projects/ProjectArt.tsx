@@ -64,9 +64,9 @@ export function ProjectArt({ project, className, variant = 0, label }: { project
         <g>
           <rect x="30" y="30" width="260" height="180" fill="#fff" stroke="#171717" strokeWidth="5" />
           <rect x="30" y="30" width="260" height="24" fill="#171717" />
-          <circle cx="44" cy="42" r="5" fill="#D2693A" />
-          <circle cx="60" cy="42" r="5" fill="#D9A441" />
-          <circle cx="76" cy="42" r="5" fill="#8FA05A" />
+          <circle cx="44" cy="42" r="5" fill="#FF755E" />
+          <circle cx="60" cy="42" r="5" fill="#FFD84D" />
+          <circle cx="76" cy="42" r="5" fill="#9DDC8B" />
           <rect x="48" y="72" width={110 + variant * 20} height="14" fill={b} />
           <rect x="48" y="96" width="200" height="8" fill="#171717" opacity=".25" />
           <rect x="48" y="112" width="170" height="8" fill="#171717" opacity=".25" />

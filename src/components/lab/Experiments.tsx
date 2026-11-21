@@ -230,7 +230,7 @@ export function LatencyScale() {
       <label htmlFor="lat" className="font-hand text-xl font-bold">
         if 1 nanosecond lasted <span className="highlighter">{human(scale)}</span>…
       </label>
-      <input id="lat" type="range" min={-2} max={2} step={1} value={exp} onChange={(e) => setExp(Number(e.target.value))} className="mt-2 w-full accent-[#D2693A]" />
+      <input id="lat" type="range" min={-2} max={2} step={1} value={exp} onChange={(e) => setExp(Number(e.target.value))} className="mt-2 w-full accent-[#FF755E]" />
       <ul className="mt-3 space-y-1.5">
         {[...LATENCIES].sort((a, b) => a[1] - b[1]).map(([label, ns]) => (
           <li key={label} className="grid grid-cols-[1fr_auto] items-center gap-2 text-xs">

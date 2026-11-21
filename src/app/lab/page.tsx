@@ -52,13 +52,13 @@ export default function LabPage() {
       <section aria-labelledby="specimens" className="mt-24">
         <SectionHeading id="specimens" note="small interactive widgets">Experiments</SectionHeading>
         <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
-          <Specimen no="001" title="Sort it out" note="watch algorithms argue with an array" color="#D9A441">
+          <Specimen no="001" title="Sort it out" note="watch algorithms argue with an array" color="#FFD84D">
             <SortingVisualiser />
           </Specimen>
-          <Specimen no="002" title="Dot dash" note="text → morse / binary (with beeps)" color="#8FA05A">
+          <Specimen no="002" title="Dot dash" note="text → morse / binary (with beeps)" color="#9DDC8B">
             <MorseEncoder />
           </Specimen>
-          <Specimen no="003" title="Human-scale latency" note="an engineering concept I love" color="#3E5C76">
+          <Specimen no="003" title="Human-scale latency" note="an engineering concept I love" color="#477BFF">
             <LatencyScale />
           </Specimen>
         </div>

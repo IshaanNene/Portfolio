@@ -15,8 +15,8 @@ export type Stamp = {
 };
 
 export const stampKinds: Record<StampKind, { label: string; color: string; shape: "circle" | "rect" | "hex" | "oval" }> = {
-  launch: { label: "Launch", color: "#3E5C76", shape: "circle" },
-  hackathon: { label: "Hackathon", color: "#D2693A", shape: "rect" },
+  launch: { label: "Launch", color: "#477BFF", shape: "circle" },
+  hackathon: { label: "Hackathon", color: "#FF755E", shape: "rect" },
   certification: { label: "Certified", color: "#2f8a3a", shape: "hex" },
   milestone: { label: "Milestone", color: "#171717", shape: "oval" },
 };

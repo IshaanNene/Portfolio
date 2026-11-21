@@ -14,15 +14,15 @@ import { Washi, type WashiPattern } from "@/components/ui/Scrapbook";
 import { Staple } from "@/components/scrapbook/pieces";
 
 const WASHI: [WashiPattern, string][] = [
-  ["stripe", "#D2693A"],
-  ["dots", "#3E5C76"],
-  ["grid", "#8FA05A"],
-  ["check", "#D9A441"],
+  ["stripe", "#FF755E"],
+  ["dots", "#477BFF"],
+  ["grid", "#9DDC8B"],
+  ["check", "#FFD84D"],
 ];
 
 const statusColor: Record<Project["status"], string> = {
-  shipped: "#8FA05A",
-  "in-progress": "#D9A441",
+  shipped: "#9DDC8B",
+  "in-progress": "#FFD84D",
   prototype: "#a9c3ff",
   archived: "#d9d2c3",
 };

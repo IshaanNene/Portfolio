@@ -7,7 +7,7 @@ import { play } from "@/lib/sound";
 import { cn, tilt } from "@/lib/utils";
 import { BrandIcon } from "@/components/diary/Polaroid";
 
-const levelColor = { daily: "#8FA05A", comfortable: "#D9A441", learning: "#a9c3ff" } as const;
+const levelColor = { daily: "#9DDC8B", comfortable: "#FFD84D", learning: "#a9c3ff" } as const;
 
 function IndexCard({ skill, i }: { skill: Skill; i: number }) {
   return (
@@ -18,7 +18,7 @@ function IndexCard({ skill, i }: { skill: Skill; i: number }) {
       whileHover={{ y: -14, rotate: 0, zIndex: 10 }}
       transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.12 + i * 0.04 }}
       className="relative flex min-h-40 flex-col border-[3px] border-ink bg-paper p-3 shadow-brutal"
-      style={{ backgroundImage: "repeating-linear-gradient(180deg, transparent 0 22px, rgba(62,92,118,.2) 22px 23px)", backgroundPosition: "0 34px" }}
+      style={{ backgroundImage: "repeating-linear-gradient(180deg, transparent 0 22px, rgba(71,123,255,.2) 22px 23px)", backgroundPosition: "0 34px" }}
     >
       <span className="absolute inset-x-0 top-[33px] h-[2px] bg-coral/70" aria-hidden />
       <div className="flex items-center gap-2">

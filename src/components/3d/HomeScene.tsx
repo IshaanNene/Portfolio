@@ -36,7 +36,7 @@ function BookRig({ spread, focus, reduced, children }: { spread: number; focus: 
 }
 
 /** Room kept for the bookmark tabs: full labels from 1440px, compact tabs from 768px, none on phones. */
-const tabSpace = (w: number) => (w >= 1440 ? 170 : w >= 768 ? 70 : 0);
+const tabSpace = (w: number) => (w >= 1440 ? 200 : w >= 768 ? 96 : 0);
 
 export default function HomeScene(
   props: Omit<DiaryProps, "quality"> & { quality: "low" | "high"; focus: Focus; wide: boolean },

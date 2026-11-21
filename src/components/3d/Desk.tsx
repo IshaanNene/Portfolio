@@ -60,9 +60,9 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
     const f = readFonts();
     loadFonts(f).then(async () => {
       const [pa, pb, pc] = await Promise.all([
-        paintDeskPhoto(f, site.deskPhotos[0], "#3E5C76", 3),
-        paintDeskPhoto(f, site.deskPhotos[1], "#D2693A", 21),
-        paintDeskPhoto(f, site.deskPhotos[2], "#D9A441", 8),
+        paintDeskPhoto(f, site.deskPhotos[0], "#477BFF", 3),
+        paintDeskPhoto(f, site.deskPhotos[1], "#FF755E", 21),
+        paintDeskPhoto(f, site.deskPhotos[2], "#FFD84D", 8),
       ]);
       if (!alive) return;
       setTex({
@@ -70,7 +70,7 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
         photoA: pa,
         photoB: pc,
         photoC: pb,
-        sticky: paintSticky(f, `hi! I'm ${site.firstName}. open me →`, "#D9A441"),
+        sticky: paintSticky(f, `hi! I'm ${site.firstName}. open me →`, "#FFD84D"),
         blob: paintBlobShadow(),
         sheets: [paintTornSheet("#d9c19a", 3), paintTornSheet("#FBF5E8", 7, true), paintTornSheet("#B5835A", 11)],
         graph: paintTornSheet("#f4f7ef", 19, false, true),
@@ -79,13 +79,13 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
           paintInkNote(f, "one more experiment...", "left", "#f5f0e0", 5),
           paintInkNote(f, "don't forget to ship this", "up", "#f5f0e0", 9),
         ],
-        washi: [paintWashi("#D2693A", "stripe"), paintWashi("#3E5C76", "dots"), paintWashi("#D9A441", "check")],
+        washi: [paintWashi("#FF755E", "stripe"), paintWashi("#477BFF", "dots"), paintWashi("#FFD84D", "check")],
         decals: [
-          paintDecal(f, "star", "#D9A441"),
-          paintDecal(f, "bolt", "#D2693A"),
-          paintDecal(f, "text", "#3E5C76", "</>"),
-          paintDecal(f, "text", "#8FA05A", "SHIP IT"),
-          paintDecal(f, "bolt", "#D9A441"),
+          paintDecal(f, "star", "#FFD84D"),
+          paintDecal(f, "bolt", "#FF755E"),
+          paintDecal(f, "text", "#477BFF", "</>"),
+          paintDecal(f, "text", "#9DDC8B", "SHIP IT"),
+          paintDecal(f, "bolt", "#FFD84D"),
         ],
       });
     });
@@ -166,13 +166,13 @@ export function Desk({ quality, reduced, wide }: { quality: "low" | "high"; redu
 
           {/* scrapbooking supplies */}
           <group position={[-1.85, 0, 0.5]} rotation={[0, 0.3, 0]}>
-            <WashiRoll color="#D2693A" stripMap={tex.washi[0]} strip={0.55} />
+            <WashiRoll color="#FF755E" stripMap={tex.washi[0]} strip={0.55} />
           </group>
           <group position={[-2.2, 0, 0.0]} rotation={[0, -0.6, 0]}>
-            <WashiRoll color="#3E5C76" stripMap={tex.washi[1]} />
+            <WashiRoll color="#477BFF" stripMap={tex.washi[1]} />
           </group>
           <group position={[2.0, 0, 0.7]} rotation={[0, 2.6, 0]}>
-            <WashiRoll color="#D9A441" stripMap={tex.washi[2]} strip={0.4} />
+            <WashiRoll color="#FFD84D" stripMap={tex.washi[2]} strip={0.4} />
           </group>
           <group position={[-1.75, 0, -0.8]} rotation={[0, 0.4, 0]}>
             <Decal map={tex.decals[0]} size={0.34} />

@@ -65,7 +65,7 @@ export function DiaryFallback({ interactive = true, className }: { interactive?:
             <Image src={site.photo} alt={site.photoAlt} width={320} height={400} unoptimized={isSvg} priority className="aspect-[4/5] w-full border-2 border-ink object-cover" />
             <span className="absolute bottom-0.5 left-2 font-hand text-lg font-bold">that&rsquo;s me ↑</span>
           </span>
-          <span className="absolute bottom-10 left-9 w-[42%] -rotate-3 bg-[#EFE3C0] p-2 font-hand text-lg font-bold leading-tight shadow-[3px_4px_0_rgba(0,0,0,.25)]">
+          <span className="absolute bottom-10 left-9 w-[42%] -rotate-3 bg-[#FFF4B8] p-2 font-hand text-lg font-bold leading-tight shadow-[3px_4px_0_rgba(0,0,0,.25)]">
             {site.coverNote.replace("[PLACEHOLDER] ", "")}
           </span>
           <span

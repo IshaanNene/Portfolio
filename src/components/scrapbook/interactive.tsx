@@ -220,7 +220,7 @@ export function SecretStamp({
   label,
   mark,
   secret,
-  color = "#D2693A",
+  color = "#FF755E",
   className,
 }: {
   label: string;
@@ -288,7 +288,7 @@ export function PhotoCard({
   alt,
   caption,
   back,
-  tint = "#8FA05A",
+  tint = "#9DDC8B",
   className,
   size = "md",
 }: {

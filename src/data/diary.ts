@@ -19,10 +19,10 @@ export type PageFace =
   | { kind: "notes" };
 
 const palette: Record<string, string> = {
-  sun: "#D9A441",
-  electric: "#3E5C76",
-  coral: "#D2693A",
-  grass: "#8FA05A",
+  sun: "#FFD84D",
+  electric: "#477BFF",
+  coral: "#FF755E",
+  grass: "#9DDC8B",
   paper: "#FFFFFF",
   cream: "#F5EBD8",
   pink: "#B5835A",

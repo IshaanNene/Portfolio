@@ -7,7 +7,7 @@ import { tilt } from "@/lib/utils";
 import { play } from "@/lib/sound";
 import { DoodlePad } from "./DoodlePad";
 
-const kindColor = { idea: "#3E5C76", thought: "#171717", observation: "#2f8a3a", unfinished: "#D2693A" } as const;
+const kindColor = { idea: "#477BFF", thought: "#171717", observation: "#2f8a3a", unfinished: "#FF755E" } as const;
 
 /** Hand-drawn sketches, SVG-stroked so they "draw themselves" in. */
 function Sketch({ kind }: { kind: "server" | "bulb" | "graph" }) {
@@ -18,14 +18,14 @@ function Sketch({ kind }: { kind: "server" | "bulb" | "graph" }) {
       <svg viewBox="0 0 120 140" className="h-32 w-28" aria-hidden>
         <motion.path {...common} {...draw} d="M60 10 C 25 10, 15 55, 40 75 C 46 82, 46 92, 46 100 L 74 100 C 74 92, 74 82, 80 75 C 105 55, 95 10, 60 10 Z" />
         <motion.path {...common} {...draw} d="M48 110 H72 M50 120 H70 M56 130 H64" />
-        <motion.path {...common} {...draw} stroke="#D9A441" strokeWidth={4} d="M10 30 L22 36 M110 30 L98 36 M60 0 V4 M8 70 L20 66 M112 70 L100 66" />
+        <motion.path {...common} {...draw} stroke="#FFD84D" strokeWidth={4} d="M10 30 L22 36 M110 30 L98 36 M60 0 V4 M8 70 L20 66 M112 70 L100 66" />
       </svg>
     );
   if (kind === "graph")
     return (
       <svg viewBox="0 0 180 120" className="h-28 w-44" aria-hidden>
         <motion.path {...common} {...draw} d="M10 10 V110 H170" />
-        <motion.path {...common} {...draw} stroke="#D2693A" d="M14 100 C 40 98, 60 90, 80 70 S 120 20, 165 15" />
+        <motion.path {...common} {...draw} stroke="#FF755E" d="M14 100 C 40 98, 60 90, 80 70 S 120 20, 165 15" />
         <motion.path {...common} {...draw} strokeDasharray="5 6" d="M14 100 L 165 60" />
       </svg>
     );
@@ -33,7 +33,7 @@ function Sketch({ kind }: { kind: "server" | "bulb" | "graph" }) {
     <svg viewBox="0 0 200 120" className="h-28 w-48" aria-hidden>
       <motion.path {...common} {...draw} d="M10 20 h50 v35 h-50 z M140 20 h50 v35 h-50 z M75 80 h50 v30 h-50 z" />
       <motion.path {...common} {...draw} d="M60 37 C 90 30, 110 30, 140 37 M35 55 C 40 80, 60 90, 75 95 M165 55 C 160 80, 140 90, 125 95" />
-      <motion.path {...common} {...draw} stroke="#3E5C76" d="M95 60 l5 -8 l5 8" />
+      <motion.path {...common} {...draw} stroke="#477BFF" d="M95 60 l5 -8 l5 8" />
     </svg>
   );
 }

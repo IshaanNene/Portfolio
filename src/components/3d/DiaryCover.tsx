@@ -87,9 +87,9 @@ export function DiaryCover({ width, height, thickness, hingeZ, open, cover, insi
       </mesh>
       {/* objects glued onto the cover — each a separate physical layer */}
       <group position={[0, 0, thickness / 2]}>
-        <CoverPiece W={width} H={height} cx={500} cy={300} w={740} h={300} rot={0.025} lift={0.006} map={layers.nameplate} edge="#d9c9a6" shadows={shadows} />
-        <CoverPiece W={width} H={height} cx={722} cy={830} w={350} h={420} rot={-0.06} lift={0.01} map={layers.photo} edge="#e6dcc8" shadows={shadows} />
-        <CoverPiece W={width} H={height} cx={339} cy={810} w={380} h={360} rot={0.05} lift={0.005} map={layers.note} edge="#d8c8a4" shadows={shadows} fold />
+        <CoverPiece W={width} H={height} cx={500} cy={300} w={740} h={300} rot={0.025} lift={0.006} map={layers.nameplate} edge="#e8c13a" shadows={shadows} />
+        <CoverPiece W={width} H={height} cx={722} cy={830} w={350} h={420} rot={-0.06} lift={0.01} map={layers.photo} edge="#f4f4f4" shadows={shadows} />
+        <CoverPiece W={width} H={height} cx={339} cy={810} w={380} h={360} rot={0.05} lift={0.005} map={layers.note} edge="#e9dcc0" shadows={shadows} fold />
         {/* tape holding the photo and the note */}
         <Tape3D W={width} H={height} cx={735} cy={622} w={190} rot={0.12} z={0.017} />
         <Tape3D W={width} H={height} cx={330} cy={650} w={150} rot={-0.18} z={0.012} />
@@ -165,10 +165,10 @@ function CoverPiece({
   const flap = Math.min(sw, sh) * 0.2;
   return (
     <group position={[px(W, cx), py(H, cy), 0]} rotation={[0, 0, rot]}>
-      {/* soft contact shadow on the leather */}
-      <mesh position={[0.012, -0.016, 0.0015]}>
-        <planeGeometry args={[sw * 1.02, sh * 1.02]} />
-        <meshBasicMaterial color="#0d0602" transparent opacity={0.45} depthWrite={false} />
+      {/* hard neo-brutalist offset shadow on the leather */}
+      <mesh position={[0.02, -0.024, 0.0015]}>
+        <planeGeometry args={[sw, sh]} />
+        <meshBasicMaterial color="#171717" transparent opacity={0.8} depthWrite={false} />
       </mesh>
       <mesh position={[0, 0, lift]} castShadow={shadows} receiveShadow={shadows}>
         <boxGeometry args={[sw, sh, t]} />
@@ -184,7 +184,7 @@ function CoverPiece({
         <group position={[sw / 2 - flap / 2, -sh / 2 + flap / 2, lift + t / 2]} rotation={[0, 0, Math.PI / 4]}>
           <mesh rotation={[-0.75, 0, 0]} position={[0, 0, 0.001]}>
             <shapeGeometry args={[foldShape(flap)]} />
-            <meshStandardMaterial color="#cdbb92" side={THREE.DoubleSide} roughness={0.8} />
+            <meshStandardMaterial color="#e3d6b8" side={THREE.DoubleSide} roughness={0.8} />
           </mesh>
         </group>
       )}
@@ -206,7 +206,7 @@ function Tape3D({ W, H, cx, cy, w, rot, z }: { W: number; H: number; cx: number;
   return (
     <mesh position={[px(W, cx), py(H, cy), z]} rotation={[0, 0, rot]}>
       <planeGeometry args={[(w / 1000) * W, (46 / 1400) * H]} />
-      <meshStandardMaterial color="#d9bf8c" transparent opacity={0.78} roughness={0.6} depthWrite={false} />
+      <meshStandardMaterial color="#fff2b3" transparent opacity={0.75} roughness={0.5} depthWrite={false} />
     </mesh>
   );
 }

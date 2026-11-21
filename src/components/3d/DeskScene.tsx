@@ -19,11 +19,11 @@ function paintScreen(f: Fonts) {
   ctx.fillRect(0, 0, 512, 320);
   ctx.font = `500 20px ${f.mono}`;
   const lines = [
-    ["#8FA05A", "~/diary $ npm run dev"],
+    ["#9DDC8B", "~/diary $ npm run dev"],
     ["#F5EBD8", "  ▲ ready on :3000"],
-    ["#D9A441", "~/diary $ git commit -m"],
-    ["#D9A441", '  "more tape"'],
-    ["#D2693A", "~/diary $ _"],
+    ["#FFD84D", "~/diary $ git commit -m"],
+    ["#FFD84D", '  "more tape"'],
+    ["#FF755E", "~/diary $ _"],
   ];
   lines.forEach(([col, t], i) => {
     ctx.fillStyle = col;
@@ -138,9 +138,9 @@ function DeskContents({
       if (!alive) return;
       setTex({
         wood: paintWood(quality === "high" ? 1 : 0.5),
-        p1: paintPhoto(f, "#D2693A", "somewhere good", 12),
-        p2: paintPhoto(f, "#8FA05A", "build night", 17),
-        sticky: paintSticky(f, "click things on my desk :)", "#8FA05A"),
+        p1: paintPhoto(f, "#FF755E", "somewhere good", 12),
+        p2: paintPhoto(f, "#9DDC8B", "build night", 17),
+        sticky: paintSticky(f, "click things on my desk :)", "#9DDC8B"),
         label: paintLabel(f, "SCRIBBLES", "#FFFFFF"),
         screen: paintScreen(f),
         blob: paintBlobShadow(),

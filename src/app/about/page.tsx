@@ -44,15 +44,15 @@ export default function AboutPage() {
         {/* snapshots tucked under the portrait — click to read the backs */}
         <div className="relative mx-auto mt-10 flex max-w-xs justify-center gap-3">
           <div className="relative -rotate-6">
-            <Washi pattern="dots" color="#D2693A" className="-top-3 left-6 -rotate-12 !w-16" />
-            <PhotoCard alt="a snapshot placeholder" caption="a good day" tint="#D9A441" size="sm" back="swap in a real photo in app/about/page.tsx" />
+            <Washi pattern="dots" color="#FF755E" className="-top-3 left-6 -rotate-12 !w-16" />
+            <PhotoCard alt="a snapshot placeholder" caption="a good day" tint="#FFD84D" size="sm" back="swap in a real photo in app/about/page.tsx" />
           </div>
           <div className="relative mt-6 rotate-[5deg]">
-            <Washi pattern="grid" color="#3E5C76" className="-top-3 right-6 rotate-12 !w-16" />
+            <Washi pattern="grid" color="#477BFF" className="-top-3 right-6 rotate-12 !w-16" />
             <PhotoCard alt="another snapshot placeholder" caption="somewhere I like" tint="#a9c3ff" size="sm" back="ask me about this one." />
           </div>
-          <Doodle kind="bulb" className="absolute -bottom-6 -left-8 h-12 w-12" color="#D2693A" />
-          <HandArrow className="absolute -right-14 -top-8 hidden rotate-[200deg] md:block" color="#3E5C76" />
+          <Doodle kind="bulb" className="absolute -bottom-6 -left-8 h-12 w-12" color="#FF755E" />
+          <HandArrow className="absolute -right-14 -top-8 hidden rotate-[200deg] md:block" color="#477BFF" />
         </div>
         </div>
         <div>
@@ -91,7 +91,7 @@ export default function AboutPage() {
           </dl>
         </div>
         <div className="relative border-[3px] border-ink bg-electric p-5 text-paper shadow-brutal" style={{ transform: `rotate(${tilt(3, 1.5)}deg)` }}>
-          <Doodle kind="bulb" className="absolute -right-4 -top-8 h-14 w-14" color="#D9A441" />
+          <Doodle kind="bulb" className="absolute -right-4 -top-8 h-14 w-14" color="#FFD84D" />
           <h2 className="font-display text-2xl font-extrabold uppercase">What I love building</h2>
           <ul className="mt-3 space-y-1">
             {site.enjoyBuilding.map((x, i) => (

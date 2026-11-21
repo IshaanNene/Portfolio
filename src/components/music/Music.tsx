@@ -187,7 +187,7 @@ export function GuitarCorner() {
             alt="Me with my guitar"
             caption={guitar.photos[0].caption}
             back={clean(guitar.photos[0].back)}
-            tint="#D9A441"
+            tint="#FFD84D"
             size="md"
           />
         </div>
@@ -216,7 +216,7 @@ export function GuitarCorner() {
           <p className="mt-3 font-hand text-2xl font-bold leading-tight">
             learning: <HoverNote note="slowly. very slowly.">{clean(guitar.learning)}</HoverNote>
           </p>
-          <HandArrow className="absolute -bottom-6 right-4 rotate-[160deg]" color="#D2693A" />
+          <HandArrow className="absolute -bottom-6 right-4 rotate-[160deg]" color="#FF755E" />
         </div>
       </TornPaper>
 
@@ -224,7 +224,7 @@ export function GuitarCorner() {
       <div className="flex flex-col items-center gap-8 md:col-span-2 md:flex-row md:justify-center lg:col-span-1 lg:flex-col">
         <Sticker label="guitar pick sticker">
           <svg viewBox="0 0 100 110" className="h-24 w-24" aria-hidden>
-            <path d="M50 104 C 20 78 6 52 8 30 C 10 10 30 4 50 4 C 70 4 90 10 92 30 C 94 52 80 78 50 104 Z" fill="#D2693A" stroke="#fff" strokeWidth="10" paintOrder="stroke" />
+            <path d="M50 104 C 20 78 6 52 8 30 C 10 10 30 4 50 4 C 70 4 90 10 92 30 C 94 52 80 78 50 104 Z" fill="#FF755E" stroke="#fff" strokeWidth="10" paintOrder="stroke" />
             <path d="M50 104 C 20 78 6 52 8 30 C 10 10 30 4 50 4 C 70 4 90 10 92 30 C 94 52 80 78 50 104 Z" fill="none" stroke="#171717" strokeWidth="3.5" />
             <text x="50" y="48" textAnchor="middle" fontSize="15" fontWeight="800" fill="#171717" style={{ fontFamily: "var(--font-display)" }}>
               .73mm

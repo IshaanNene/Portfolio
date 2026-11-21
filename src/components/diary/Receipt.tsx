@@ -145,7 +145,7 @@ export function Receipt() {
 
           <div className="relative mt-6 text-center" data-print>
             <span data-stamp className="absolute -top-16 right-0 inline-block">
-              <RubberStamp color="#D2693A">Paid in full</RubberStamp>
+              <RubberStamp color="#FF755E">Paid in full</RubberStamp>
             </span>
             <Barcode value={site.name + "receipt"} />
             <p className="mt-1 text-[11px] tracking-[0.4em]">{site.initials}-0001-2026</p>

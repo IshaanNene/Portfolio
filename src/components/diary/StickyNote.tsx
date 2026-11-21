@@ -42,7 +42,7 @@ export function StickyNote({ note, index, constraints }: { note: StickyNoteData;
       style={{ zIndex: z }}
       className="relative h-52 w-full cursor-grab touch-none [perspective:900px] active:cursor-grabbing sm:h-56"
     >
-      <Pin color={index % 2 ? "#3E5C76" : "#D2693A"} className="-top-2" />
+      <Pin color={index % 2 ? "#477BFF" : "#FF755E"} className="-top-2" />
       <div
         role="button"
         tabIndex={0}

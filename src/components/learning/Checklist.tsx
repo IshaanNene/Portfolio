@@ -47,7 +47,7 @@ function Tally({ n }: { n: number }) {
             {Array.from({ length: Math.min(4, k) }).map((_, i) => (
               <path key={i} d={`M${4 + i * 6} 2 Q${5 + i * 6} 11 ${3.5 + i * 6} 20`} stroke="#171717" strokeWidth="2.2" strokeLinecap="round" fill="none" />
             ))}
-            {k === 5 && <path d="M0 16 L28 5" stroke="#D2693A" strokeWidth="2.4" strokeLinecap="round" />}
+            {k === 5 && <path d="M0 16 L28 5" stroke="#FF755E" strokeWidth="2.4" strokeLinecap="round" />}
           </svg>
         );
       })}
@@ -110,7 +110,7 @@ export function Checklist() {
           </div>
           {/* pencil progress */}
           <div className="mt-2 h-3 w-full border-2 border-ink bg-paper" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={finished} aria-label="Learning progress">
-            <motion.div className="h-full bg-[repeating-linear-gradient(45deg,#D9A441_0_6px,#f0c43a_6px_12px)]" animate={{ width: `${(finished / total) * 100}%` }} />
+            <motion.div className="h-full bg-[repeating-linear-gradient(45deg,#FFD84D_0_6px,#f0c43a_6px_12px)]" animate={{ width: `${(finished / total) * 100}%` }} />
           </div>
 
           <AnimatePresence mode="wait">
@@ -148,7 +148,7 @@ export function Checklist() {
                             <motion.path
                               d="M0 7 C 15 2, 30 11, 50 6 S 85 3, 100 8"
                               fill="none"
-                              stroke="#D2693A"
+                              stroke="#FF755E"
                               strokeWidth="3"
                               strokeLinecap="round"
                               vectorEffect="non-scaling-stroke"
