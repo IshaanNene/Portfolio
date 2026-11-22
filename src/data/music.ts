@@ -40,8 +40,8 @@ export const onRepeat: string[] = ["Lateralus — Tool", "Madvillainy — Madvil
  */
 export const guitar = {
   photos: [
-    { src: "", caption: "me + guitar", back: "one of the best guitarists in college — says my own GitHub README." },
-    { src: "", caption: "practice corner", back: "where the chess engines get a break." },
+    { src: "/images/guitar/bass.webp", caption: "me + guitar", back: "one of the best guitarists in college — says my own GitHub README." },
+    { src: "/images/guitar/stage.webp", caption: "on stage", back: "horns up, in front of the LED wall." },
   ],
   learning: "",
   gear: "",

@@ -190,7 +190,7 @@ export function GuitarCorner() {
           <Washi pattern="dots" color="#B5835A" className="-top-3 left-1/2 -translate-x-1/2 rotate-3 !w-20" />
           <PhotoCard
             src={guitar.photos[0].src ? `${base}${guitar.photos[0].src}` : undefined}
-            alt="Me with my guitar"
+            alt="Me playing guitar, motion-blurred under stage lights"
             caption={guitar.photos[0].caption}
             back={clean(guitar.photos[0].back)}
             tint="#FFD84D"
@@ -201,7 +201,7 @@ export function GuitarCorner() {
           <PaperClip className="absolute -top-6 left-6 z-10 rotate-[-8deg]" />
           <PhotoCard
             src={guitar.photos[1].src ? `${base}${guitar.photos[1].src}` : undefined}
-            alt="Practice corner"
+            alt="My silhouette on stage, horns up against a purple LED wall"
             caption={guitar.photos[1].caption}
             back={clean(guitar.photos[1].back)}
             tint="#a9c3ff"
