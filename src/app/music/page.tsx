@@ -26,7 +26,7 @@ export default function MusicPage() {
       </section>
 
       <section aria-labelledby="guitar" className="mt-28">
-        <SectionHeading id="guitar" note="I play guitar. badly, then less badly.">Guitar corner</SectionHeading>
+        <SectionHeading id="guitar" note="I play guitar — one of the best in my college.">Guitar corner</SectionHeading>
         <GuitarCorner />
       </section>
     </PageShell>
